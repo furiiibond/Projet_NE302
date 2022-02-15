@@ -1,24 +1,21 @@
 MYNAME=LAPIERRE_Jean-Camille_HUGO_JEAN
-IGNORE = old_generate.c.old
-## Do not change below please
-BIN = test
-PREFIX=MIPS3
+
+BIN = exec
+PREFIX=http
 CC = gcc
-FLAGS = -Wall
+FLAGS = -Wall -Wextra -Werror -g
 C_FILES = $(wildcard *.c)
 OBJ_FILES = $(C_FILES:.c=.o)
 
 all: $(OBJ_FILES)
-	$(CC) $(FLAGS) -o $(BIN) $^ -lm
+	$(CC) $(FLAGS) -o $(BIN) $^ 
 
 %.o: %.c
 	$(CC) $(FLAGS) -c $^
 
 clean:
-	rm -f *.o *~ $(BIN) *.hex *.s *.pdf
-
-
-# A useful command to deliver your project while keeping me sane
+	rm -f *.o $(BIN)
+	
 tar: clean
 	dir=$$(basename $$PWD) && echo "compressing $(dir)" && cd .. && \
 	tar cvfz "$(PREFIX)-$(MYNAME).tgz" \
