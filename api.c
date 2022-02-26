@@ -1,20 +1,19 @@
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include "api.h"
 
 typedef struct node {
-    char *tag;
-    char *value; // Value of the field
-    int len;  // number of char
-    struct node *child; // point on a child node.
-    struct node *brother; // point on a brother node
+    char* tag;
+    char* value; // pointer to the first char of the value
+    int len;  // number of char starting from pointer value
+    struct node *child; // pointer to the first child or NULL
+    struct node *brother; // pointer to the next brother node or NULL
 } node;
 
 
-
-node *generateNodes(char* value ,int len , char nextDelim[]){
-    node *node= malloc(sizeof(node));
+node *generateNodes(char* value, int len, char nextDelim[]) {
+    node *node = malloc(sizeof(node)); // TODO: check malloc failed
     //node->tag     calculated
     node->len = len;
     node->value = value;
@@ -22,17 +21,13 @@ node *generateNodes(char* value ,int len , char nextDelim[]){
     return node;
 }
 
-int parseur(char *req, int len)
-{
+int parseur(char* req, int len) {
     char delim[] = "\r\n";
-
     char *ptr = strtok(req, delim);
 
-    while(ptr != NULL)
-    {
+    while (ptr != NULL) {
         printf("'%s'\n", ptr);
         ptr = strtok(NULL, delim);
     }
     return 0; // TODO
 }
-
