@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include "api.h"
+#include "abnf.h"
 
 typedef struct node {
     char* tag;
@@ -11,9 +11,12 @@ typedef struct node {
     struct node *brother; // pointer to the next brother node or NULL
 } node;
 
-
 node *generateNodes(char* value, int len, char nextDelim[]) {
-    node *node = malloc(sizeof(node)); // TODO: check malloc failed
+    node *node = malloc(sizeof(node));
+    if (node == NULL) {
+        perror("malloc failed");
+        exit(1);
+    }
     //node->tag     calculated
     node->len = len;
     node->value = value;
@@ -22,12 +25,16 @@ node *generateNodes(char* value, int len, char nextDelim[]) {
 }
 
 int parseur(char* req, int len) {
-    char delim[] = "\r\n";
+   /* char delim[] = "\r\n";
     char *ptr = strtok(req, delim);
 
     while (ptr != NULL) {
         printf("'%s'\n", ptr);
         ptr = strtok(NULL, delim);
     }
-    return 0; // TODO
+    return 0; // TODO*/
+    int leng = httpMessage(req, len);
+    req += leng;
+    printf("%s", req);
+    return leng;
 }
