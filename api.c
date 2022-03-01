@@ -34,7 +34,6 @@ int parseur(char* req, int len) {
     }
     return 0; // TODO*/
     int leng = httpMessage(req, len);
-    req += leng;
-    printf("%s", req);
+    printf("%d ==> %s", leng, req+leng);
     return leng;
 }
