@@ -4,7 +4,7 @@ BIN = exec
 PREFIX=http
 CC = gcc
 FLAGS = -Wall -Wextra -Werror -g
-C_FILES = $(wildcard *.c)
+C_FILES = api.c mainTemp.c
 OBJ_FILES = $(C_FILES:.c=.o)
 
 all: $(OBJ_FILES)

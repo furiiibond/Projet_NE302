@@ -37,22 +37,24 @@ int main(int argc, char *argv[]) {
         p = argv[2];
         printf("searching for %s\n",p);
         while (*p) {
-            if (*p == '-') { *p = '_'; }
+            if (*p == '-') { // transformation of - into _
+                *p = '_';
+            }
             p++;
         }
         p = argv[2];
     }
     // call parser and get results.
-    if (res = parseur(addr,st.st_size)) {
+    if (res = parseur(addr, st.st_size)) {
         _Token *r, *tok;
         void *root = NULL;
         root = getRootTree();
-        r = searchTree(root,p);
+        r = searchTree(root, p);
         tok = r;
         while (tok) {
             int l;
             char *s;
-            s = getElementValue(tok->node,&l);
+            s = getElementValue(tok->node, &l);
             printf("FOUND [%.*s]\n", l, s);
             tok = tok->next;
         }
