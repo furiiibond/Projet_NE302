@@ -1,11 +1,22 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "abnf.h"
 
 int httpMessage(char* req, int len) {
     // ajouter un noeud à l'arbre. La racine
-    int leng = debut(req, len);
-    req += leng;
-    return leng;
+    int leng_debut = debut(req, len);
+    req += leng_debut;
+    len -= leng_debut;
+    int leng_body = body(req, len);
+    req += leng_body;
+    len -= leng_body;
+    int leng_ponc = ponct(req, len); // may be 0 because it's optionnal
+    req += leng_ponc;
+    len -= leng_ponc;
+    int leng_fin = fin(req, len);
+    req += leng_fin;
+    len -= leng_fin;
+    return leng_debut + leng_body + leng_fin + leng_ponc; // + Line Feed?
 }
 
 int debut(char* req, int len) {
