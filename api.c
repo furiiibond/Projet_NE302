@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "api.h"
 #include "abnf.h"
+
+#define DISPLAY_MAX 30
 
 typedef struct node {
     char* tag;
@@ -88,24 +91,30 @@ _Token *generateToken(node* nod) {
 /*
  *      Traversal of the Tree and adding a new node to the linked list tok when matching name
  */
-void _searchTree(node *start, char *name, _Token *tok) {
-        if (start == NULL)
-            return;
-		
-        if (strcmp(start->tag, name) == 0) {
-            tok->next = generateToken(start);
-			tok = tok->next;
-        }
+void _searchTree(node *start, char *name, _Token **tok) {
+    if (start == NULL)
+        return;
 
-        node *cur = start;
-
-        while (cur) {
-            if (cur->child)
-                _searchTree(cur->child, name, tok);
-			if (cur->brother)
-                _searchTree(cur->brother, name, tok);
-            cur = cur->brother;
+    if (strcmp(start->tag, name) == 0) {
+        if (*tok == NULL)
+            *tok = generateToken(start);
+        else {
+            _Token *tmp = *tok;
+            while (tmp->next)
+                tmp = tmp->next;
+            tmp->next = generateToken(start);
         }
+    }
+    node *cur = start;
+
+    while (cur) {
+        if (cur->child)
+            _searchTree(cur->child, name, tok);
+        if (cur->brother)
+            _searchTree(cur->brother, name, tok);
+        cur = cur->brother;
+    }
+
 }
 
 /*
@@ -114,10 +123,10 @@ void _searchTree(node *start, char *name, _Token *tok) {
 _Token *searchTree(void *start, char *name) {
         node *tmp = start;
         if (tmp == NULL)
-            return NULL;
-        _Token sentinelle = { NULL, NULL };
-        _searchTree(tmp, name, &sentinelle);
-        return sentinelle.next;
+            tmp = root;
+        _Token *r = NULL;
+        _searchTree(tmp, name, &r);
+        return r;
 }
 
 /*
@@ -185,4 +194,32 @@ int parseur(char* req, int len) {
     //return leng;
 	
 	return 0;
+}
+
+void display_tree(node* noeud, int n){	//1er appel : noeud=root, n=0
+    for (int i = 0; i < n; i++)
+        printf("\t");
+
+    printf("[%d]%s = \"", n, noeud->tag);
+    fflush(stdout);
+    unsigned int len = noeud->len_value;
+    if (len >= DISPLAY_MAX)
+        len = DISPLAY_MAX;
+    int i = 0;
+    while (i < len) {
+        if (noeud->value[i] != '\n' && noeud->value[i] != '\r')
+            putchar(noeud->value[i]);
+        else
+            putchar('_');
+        i++;
+    }
+    if (len < noeud->len_value)
+        printf("..");
+    printf("\"\n");
+    if (noeud->brother != NULL){
+        display_tree(noeud->brother, n);
+    }
+    if (noeud->child != NULL){
+        display_tree(noeud->child, n+1);
+    }
 }

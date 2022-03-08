@@ -16,6 +16,7 @@ node *addNodeAsBrother(char* tag, char* value, int len_value, node* current);
 node *addNodeAsChild(char* tag, char* value, int len_value, node* current);
 void createRoot(char* tag, char* value, int len_value);
 char *getElementValue(void *node, int *len);
+void display_tree(node* noeud,int n);
 
 int main() {
     char req[]="GET / HTTP/1.0\r\nHost: www.google.com\r\nTransfer-Encoding: gzip\r\n\r\n";
@@ -27,7 +28,7 @@ int main() {
     node *node1 = addNodeAsChild("start_line", "GET / HTTP/1.0\r\n", 16, getRootTree());    
     addNodeAsBrother("header_field", "Host: www.google.com\r\n", 22, node1);
 	addNodeAsChild("header_field", "Host: www.go\r\n", 14, node1);
-
+    display_tree(getRootTree(), 0);
     _Token *r;
     r = searchTree(getRootTree(), "header_field");
 	int a;
