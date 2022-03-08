@@ -160,8 +160,6 @@ void purgeElement(_Token **r) {
         free(*r);
         *r = tmp;
     }
-
-    free(r);
 }
 
 /*
