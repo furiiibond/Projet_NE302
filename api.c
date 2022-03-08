@@ -14,7 +14,7 @@ typedef struct node {
     struct node *brother; // pointer to the next brother node or NULL
 } node;
 
-node* root = NULL; // global
+node* treeRoot = NULL; // global
 
 /*
  *      Allocates and return a new node for the http tree after initializing it
@@ -37,7 +37,7 @@ node *generateNode(char* tag, char* value, int len_value) {
  *      Initalize the global root of the http tree
  */
 void createRoot(char* tag, char* value, int len_value) {
-    root = generateNode(tag, value, len_value);
+    treeRoot = generateNode(tag, value, len_value);
 }
 
 /*
@@ -71,7 +71,7 @@ node *addNodeAsChild(char* tag, char* value, int len_value, node* current) {
 }
 
 void *getRootTree() {
-    return root;
+    return treeRoot;
 }
 
 /*
@@ -123,7 +123,7 @@ void _searchTree(node *start, char *name, _Token **tok) {
 _Token *searchTree(void *start, char *name) {
         node *tmp = start;
         if (tmp == NULL)
-            tmp = root;
+            tmp = treeRoot;
         _Token *r = NULL;
         _searchTree(tmp, name, &r);
         return r;
@@ -192,17 +192,17 @@ int parseur(char* req, int len) {
     //int leng = httpMessage(req, len);
     //printf("%d ==> %s", leng, req+leng);
     //return leng;
-	
+
 	return 0;
 }
 
-void display_tree(node* noeud, int n){	//1er appel : noeud=root, n=0
+void display_tree(node* noeud, int n){	//1er appel : noeud=treeRoot, n=0
     for (int i = 0; i < n; i++)
         printf("\t");
 
     printf("[%d]%s = \"", n, noeud->tag);
     fflush(stdout);
-    unsigned int len = noeud->len_value;
+    int len = noeud->len_value;
     if (len >= DISPLAY_MAX)
         len = DISPLAY_MAX;
     int i = 0;

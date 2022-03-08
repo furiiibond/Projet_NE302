@@ -17,6 +17,7 @@ node *addNodeAsChild(char* tag, char* value, int len_value, node* current);
 void createRoot(char* tag, char* value, int len_value);
 char *getElementValue(void *node, int *len);
 void display_tree(node* noeud,int n);
+void purgeTree(void *root);
 
 int main() {
     char req[]="GET / HTTP/1.0\r\nHost: www.google.com\r\nTransfer-Encoding: gzip\r\n\r\n";
@@ -39,5 +40,7 @@ int main() {
         write(STDOUT_FILENO, toprint, a);
 		r = r->next;
     }
+    purgeTree(getRootTree());
+    purgeElement(&r);
     return 0;
 }
