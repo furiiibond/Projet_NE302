@@ -1,0 +1,13 @@
+SP = " " 
+HTAB = %x09 
+DIGIT = %x30-39 
+ALPHA = %x41-5A / %x61-7A 
+; This is already defined in RFC5234 
+nombre = 1* DIGIT 
+ponct = "," / "." / "!" / "?" / ":" 
+separateur = SP / HTAB / "-" / "_" 
+debut = "start" 
+fin = "fin" 
+mot = 1* ALPHA separateur  
+message = debut 2* ( mot ponct / nombre separateur ) [ ponct ] fin LF 
+LF = %x0A 

@@ -40,7 +40,7 @@ char *no_go_zone;
 // main fonction that needs to be called from parser
 int construire(char *module);
 
-int Matched_command(char **ptr, char *end);
+int Matched_command(char **ptr); // char *end);
 
 int Loop_algo_calls(int min, int max, char *debut, char *fin);
 

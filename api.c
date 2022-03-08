@@ -1,4 +1,3 @@
-#include "abnf.h"
 #include "parser.h"
 #include "annexe.h"
 #include "tree.h"
@@ -79,7 +78,7 @@ int parseur(char *req, int len) {
 
     int r = construire("HTTP-message");
 
-    printf("Validité:"); Truth(r);
+    printf("Valid:"); Truth(r);
 
     return r;
 }

@@ -2,7 +2,7 @@
 #include "annexe.h"
 
 /* ------------- ETAPE 1 ------------- */
-int Matched_command(char **ptr, char *end) {
+int Matched_command(char **ptr) { //, char *end) {
 	int Res = TRUE;
 		#ifdef DEBUG
 		printf("Matched a letter !\n");
@@ -88,7 +88,7 @@ int algo0(char *str, int len) { // if error return 1 else 0
 		#endif
 
 /*----*/if (isalpha(*ptr)) {/* ETAPE 1 ------------- */
-			Res = Matched_command(&ptr, end);
+			Res = Matched_command(&ptr);// end);
 		}
 		else
 /*----*/if (isdigit(*ptr) || *ptr=='*') {/* ETAPE 3  */

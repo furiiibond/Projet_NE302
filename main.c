@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
         p = argv[2];
     }
     // call parser and get results.
-    if (res = parseur(addr, st.st_size)) {
+    if ((res = parseur(addr, st.st_size))) {
         _Token *r, *tok;
         void *root = NULL;
         root = getRootTree();
