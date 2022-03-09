@@ -11,8 +11,8 @@
 #include <ctype.h>
 
 //ABNF Gramm file
-#define ABNF_RULES "simple.abnf"
-#define FIRST_TAG "message"
+#define ABNF_RULES "allrfc.abnf"
+#define FIRST_TAG "HTTP-message"
 
 //Maximum rule line size
 #define CONTENT_LEN 1000
