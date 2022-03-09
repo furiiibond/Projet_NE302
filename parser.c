@@ -2,13 +2,13 @@
 #include "annexe.h"
 
 /* ------------- ETAPE 1 ------------- */
-int Matched_command(char **ptr) { //, char *end) {
-	int Res = TRUE;
+int matchedCommand(char **ptr, char *end, node **node_ptr) {
+	int res = TRUE;
 		#ifdef DEBUG
 		printf("Matched a letter !\n");
 		#endif
 	char * debut = (*ptr);
-	while(!isspace(*++(*ptr))) ;
+	while (*ptr < end && !isspace(*++(*ptr))) ;
 
 	char command[50];
 	int longueur = ((*ptr) - debut);
@@ -18,23 +18,31 @@ int Matched_command(char **ptr) { //, char *end) {
 			printf(BLUE "cmd_> %s\n"NC" ",command);
 		#endif
 	char* backup = mem;
+
 /** ####### APPEL RECURSIF ##################*/
-/** #####*/	Res = construire(command); /**####*/
+/** #####*/	res = construire(command,*node_ptr); /**####*/
 /** #########################################*/
-	if (!Res)
+	if (!res)
         mem = backup;
+
+    else{ //Si la construction est un succes on met bien à jour le papa est on crée un nouveau frère pour node_ptr
+        strcpy((*node_ptr)->tag,command);
+        (*node_ptr)->value = backup;
+        (*node_ptr)->len_value = mem-backup;
+        (*node_ptr) = addNodeAsBrother("", mem, 0, *node_ptr);
+    }
 		#ifdef DEBUG
-			printf("Res %s: ", command); Truth(Res);
+			printf("res %s: ", command); Truth(res);
 		#endif
-	return Res;
+	return res;
 }
 
-int Loop_algo_calls(int min, int max, char *debut, char *fin) {
-	int Res = TRUE;
+int loopAlgoCalls(int min, int max, char *debut, char *fin, node** noeud) {
+	int res = TRUE;
 	char *backup = mem;
 	char *backup2 = mem; // if we validate less time than min
 	int i = 0;
-	while (i < max && Res) {
+	while (i < max && res) {
 		#ifdef DEBUG_MEMVIEW
 		printf(CYN"tmp:%c\n"NC, *mem);
 		#endif
@@ -43,21 +51,28 @@ int Loop_algo_calls(int min, int max, char *debut, char *fin) {
         fflush(stdout);
 		write(STDOUT_FILENO, debut, fin - debut);
 		printf(RED")\n"NC);
-		#endif
-		Res = algo0(debut,fin - debut);
-		if (Res)
+        #endif
+
+		res = algo0(debut,fin - debut, *noeud);
+        if (res) {
+            while ((*noeud)->brother)
+                (*noeud) = (*noeud)->brother;//get back to the current empty child( the last)
+        } else
+            reset_first_child_queue(noeud);
+
+        if (res)
             backup = mem;
-		i += Res;
+		i += res;
 	}
     mem = backup;
-	Res = (i >= min) && (i <= max);
-	if (!Res)
+	res = (i >= min) && (i <= max);
+	if (!res)
         mem = backup2;
 	#ifdef DEBUG
 		printf("\texit loop with i=%d\n", i);
-		printf("Res: "); Truth(Res);
+		printf("res: "); Truth(res);
 	#endif
-	return Res;
+	return res;
 }
 /*
 int Matched_digit(char** ptr, char *end){
@@ -70,9 +85,19 @@ int Matched_crochet(){
 }
 */
 
-int algo0(char *str, int len) { // if error return 1 else 0
+void reset_first_child_queue(node* noeud){
+    noeud->tag[0]='\0';
+    noeud->len_value = 0;
+    if(noeud->brother!=NULL){
+        purgeTree(noeud->brother);
+        noeud->brother=NULL;
+    }
+}
+
+int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 	char *ptr, *end;
-	int Res = TRUE;
+    node * node_ptr = first_Child;
+	int res = TRUE;
 	ptr = str;
 	end = str + len;
 	#ifdef DEBUG
@@ -88,7 +113,8 @@ int algo0(char *str, int len) { // if error return 1 else 0
 		#endif
 
 /*----*/if (isalpha(*ptr)) {/* ETAPE 1 ------------- */
-			Res = Matched_command(&ptr);// end);
+
+            res = matchedCommand(&ptr, end, &node_ptr);
 		}
 		else
 /*----*/if (isdigit(*ptr) || *ptr=='*') {/* ETAPE 3  */
@@ -100,7 +126,7 @@ int algo0(char *str, int len) { // if error return 1 else 0
 				#ifdef DEBUG
 				printf("Matched a digit\n");
 				#endif
-				sscanf(ptr,"%d*%d", &x, &y);
+				sscanf(ptr, "%d*%d", &x, &y);
 				if (*(ptr + 1) != '*')
 					y = x;
 			} else {
@@ -126,10 +152,10 @@ int algo0(char *str, int len) { // if error return 1 else 0
 			}
             else {
 				//Etape n°32
-				while (!isspace(*++ptr)) ;
+				while (! isspace(*++ptr)) ;
 			}
 
-			Loop_algo_calls(x, y, debut_chaine, ptr);
+            loopAlgoCalls(x, y, debut_chaine, ptr, &node_ptr);
 
 			if (*ptr == ')')
                 ptr++;
@@ -139,7 +165,7 @@ int algo0(char *str, int len) { // if error return 1 else 0
 			#ifdef DEBUG
 			printf("Matched '%%' !\n");
 			#endif
-			ptr++;
+			ptr ++;
 			assert(*ptr == 'x');
 			#ifdef DEBUG
 			puts("\tx is there, good.");
@@ -152,17 +178,17 @@ int algo0(char *str, int len) { // if error return 1 else 0
 				#endif
 				int nb;
 				char *mem_bak = mem;
-				while(!isspace(*ptr) && Res && mem < no_go_zone) {
+				while(!isspace(*ptr) && res && mem < no_go_zone) {
 					sscanf(ptr + 1, "%x", &nb);
 					#ifdef DEBUG_MEMVIEW
 						printf("\t\twhl ptr:%c\n",*(ptr));
 						printf("\t\tmem: %c %x | ptr: %c %x\n", *mem, *mem, nb, nb);
 					#endif
-					Res = (*mem == nb);
-					mem += Res;
+					res = (*mem == nb);
+					mem += res;
                     ptr += 3;
 				}
-				if (!Res) {
+				if (!res) {
                     mem = mem_bak;
                 }
             }
@@ -183,11 +209,11 @@ int algo0(char *str, int len) { // if error return 1 else 0
 				#ifdef DEBUG_MEMVIEW
 					printf("\t\th1:%x h2:%x | mem:%x %c\n", h1, h2, *mem, *mem);
 				#endif
-				Res = ((*mem & MASK_OCTET) >= h1) && ((*mem & MASK_OCTET) <= h2);
-				mem += Res;
+				res = ((*mem & MASK_OCTET) >= h1) && ((*mem & MASK_OCTET) <= h2);
+				mem += res;
 			}
 			#ifdef DEBUG
-				printf("Res: "); Truth(Res);
+				printf("res: "); Truth(res);
 			#endif
 		}
 		else
@@ -198,9 +224,9 @@ int algo0(char *str, int len) { // if error return 1 else 0
 			ptr++;
 			int longueur = distance_from(ptr, end, '"');
 			if (mem + longueur >= no_go_zone)
-				Res = FALSE;
+				res = FALSE;
 			else
-				Res = nocase_memcomp(ptr, mem, longueur);
+				res = nocase_memcomp(ptr, mem, longueur);
 			#ifdef DEBUG_MEMVIEW
                 printf("\t[");
                 fflush(stdout);
@@ -209,11 +235,19 @@ int algo0(char *str, int len) { // if error return 1 else 0
                 fflush(stdout);
                 write(STDOUT_FILENO, mem,longueur);
                 puts("]");
-			#endif
-			mem += longueur * Res;
+            #endif
+
+            if (res) {
+                strcpy(node_ptr->tag, "case_insensitive_string");
+                node_ptr->value = mem;
+                node_ptr->len_value = longueur;
+                mem += longueur;
+                node_ptr = addNodeAsBrother("", mem, 0, node_ptr);
+            }
 			ptr += longueur + 1;
+
 			#ifdef DEBUG
-				printf("Res: "); Truth(Res);
+				printf("res: "); Truth(res);
 			#endif
 		}
 		else
@@ -225,7 +259,9 @@ int algo0(char *str, int len) { // if error return 1 else 0
 			char *debut = ptr;
 			goto_next(&ptr, end, ')');
 			// printf("stop at:%c,next:%c\n", *ptr, *(ptr+1));
-			Res = algo0(debut,ptr - debut);
+			res = algo0(debut, ptr - debut,node_ptr);
+            while(node_ptr->brother!=NULL)node_ptr=node_ptr->brother;//get back to the current empty child( the last)
+
 			#ifdef DEBUG
 				printf("Out of parenthesis; current:'%c'\n", *ptr);
 			#endif
@@ -239,7 +275,7 @@ int algo0(char *str, int len) { // if error return 1 else 0
             int x = 0;
 			int y = 1;
 
-			Loop_algo_calls(x, y, debut_chaine, ptr);
+            loopAlgoCalls(x, y, debut_chaine, ptr, &node_ptr);
 
 			ptr++;
 		}
@@ -255,18 +291,24 @@ int algo0(char *str, int len) { // if error return 1 else 0
 /* ---- ETAPE 2 ---------------------------------- */
 		{
 			if (*ptr=='/') {
-				if (Res) {
-					//WHILE EXIT (return Res)
+				if (res) {
+					//WHILE EXIT (return res)
 					ptr = end - 1;
 				} else {
-					Res = TRUE;
+					res = TRUE;
+                    node_ptr=first_Child;
+                    reset_first_child_queue(node_ptr);
 				}
 			} else {
-				if (!Res) {
+				if (!res) {
 					//Step n23 Goto '/'
 					goto_next(&ptr, end, '/');
-					if(ptr < end && *ptr == '/')
-                        Res = TRUE;
+					if(ptr < end && *ptr == '/')//peut-être que le if n'est même pas nécessaire
+                        ptr--;//Nouveau stuff
+        // /*J'ai commenté la partie en dessous car elle est censé être équivalente au fix ci-dessus (ptr--)*/
+                        //res = TRUE;
+                    //node_ptr=first_Child;
+                    //reset_first_child_queue(node_ptr);
 				}
 			}
 		}
@@ -274,28 +316,62 @@ int algo0(char *str, int len) { // if error return 1 else 0
 	}
 	if (mem > no_go_zone) {
 		perror("mem pointer out of range");
-		Res = FALSE;
+		res = FALSE;
 	}
 	#ifdef DEBUG
-		printf("Return Res:"); Truth(Res);
+		printf("Return res:"); Truth(res);
 	#endif
 
-	return Res;
+	return res;
 }
 
-int construire(char *module) {
-	int Valid = 0;
-	char *str = content(module);
-	#ifdef DEBUG_IO_CONSTRUIRE
-		printf(YELLOW"CONSTRUIRE %s\n"NC, module);
-		printf(YELLOW"str:|%s|\n"NC, str);
-	#endif
-	//char* debut_value = mem;
-	/* Procédure d'appel principale */
-    Valid = algo0(str,strlen(str));
+/* A déplacer ou vous voulez (peut-etre tree.c)*/
+int viderEmptyBrothers(node* noeud) {
+    if (noeud == NULL)
+        return 1; // failsafe
+    if (*(noeud->tag) == '\0') {
+        free(noeud);
+        return 0;
+    }
+    else {
+        if (! viderEmptyBrothers(noeud->brother))
+            noeud->brother = NULL;
+        return 1; // So previous know it's not empty
+    }
+}
+
+
+int construire(char *module, node* parent) {
+    int valid = 0;
+    char *str = content(module);
+#ifdef DEBUG_IO_CONSTRUIRE
+    printf(YELLOW"CONSTRUIRE %s\n"NC, module);
+    printf(YELLOW"str:|%s|\n"NC, str);
+#endif
+
+    char *debut_value = mem;
+
+
+    node *Current_node = addNodeAsChild(module, debut_value, 0, parent);
+    node *first_child = addNodeAsChild("", debut_value, 0, Current_node);
+
+    /* Procédure d'appel principale */
+    valid = algo0(str, strlen(str), first_child);
+
+    if (valid) {
+        if (!viderEmptyBrothers(first_child)) {
+            free(first_child);
+            Current_node->child = NULL;
+        }
+    } else {
+        purgeTree(Current_node);
+        parent->child=NULL;
+    }
+
+
 
 	#ifdef DEBUG_IO_CONSTRUIRE
-		if (Valid)
+		if (valid)
             printf(GREEN"Nice"NC" (exiting:%s)\n", module);
 		else
             printf(RED"Not nice"NC" (exiting:%s)\n", module);
@@ -306,5 +382,5 @@ int construire(char *module) {
 
 	free(str);
 
-	return Valid; // return 1 si valide
+	return valid; // return 1 si valide
 }

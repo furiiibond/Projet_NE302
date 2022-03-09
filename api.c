@@ -70,7 +70,7 @@ void purgeTree(void *root) {
 }
 
 int parseur(char *req, int len) {
-    //createRoot("HTTP-message", req, len);
+    // createRoot("HTTP-message", req, len);
     puts("OK");
 
     mem = req;
@@ -78,7 +78,8 @@ int parseur(char *req, int len) {
 
     int r = construire("HTTP-message");
 
-    printf("Valid:"); Truth(r);
+    printf("Valid:");
+    truth(r);
 
     return r;
 }

@@ -18,7 +18,7 @@ node *generateNode(char* tag, char* value, int len_value) {
         perror("generateNode: malloc failed");
         exit(1);
     }
-    node->tag = tag;
+    strcpy(node->tag,tag);
     node->value = value;
     node->len_value = len_value;
     node->child = NULL;

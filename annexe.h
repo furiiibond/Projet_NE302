@@ -15,7 +15,7 @@
 #define CONTENT_LEN 1000
 
 //Print TRUE or FALSE
-void Truth(int b);
+void truth(int b);
 
 //Return the line matching $st in ABNF_RULES
 char *content(char *st);

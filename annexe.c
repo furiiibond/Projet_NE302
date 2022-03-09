@@ -1,6 +1,6 @@
 #include "annexe.h"
 
-void Truth(int b) {
+void truth(int b) {
     if (b)
         printf(GREEN"TRUE\n"NC);
     else
