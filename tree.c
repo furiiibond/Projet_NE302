@@ -114,7 +114,7 @@ void display_tree(node* noeud, int n) {	//1er appel : noeud=treeRoot, n=0
     for (int i = 0; i < n; i++)
         printf("  ");
 
-    printf("[%d]%s = \"", n, noeud->tag);
+    printf("[%d:%s] = \"", n, noeud->tag);
     fflush(stdout);
     int len = noeud->len_value;
     if (len >= DISPLAY_MAX)

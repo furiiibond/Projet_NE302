@@ -1,6 +1,10 @@
 #include "parser.h"
 #include "annexe.h"
 
+// Global var, used to point the file to parse
+char *mem;
+char *no_go_zone;
+
 /* ------------- ETAPE 1 ------------- */
 int matchedCommand(char **ptr, char *end, node **node_ptr) {
 	int res = TRUE;
@@ -352,19 +356,19 @@ int construire(char *module, node* parent) {
     char *debut_value = mem;
 
 
-    node *Current_node = addNodeAsChild(module, debut_value, 0, parent);
-    node *first_child = addNodeAsChild("", debut_value, 0, Current_node);
+    //node *Current_node = addNodeAsChild(module, debut_value, 0, parent);
+    node *first_child = addNodeAsChild("", debut_value, 0, parent);
 
     /* Procedure d'appel principale */
     valid = algo0(str, strlen(str), first_child);
 
     if (valid) {
         if (deleteEmptyBrothers(first_child)) {
-            Current_node->child = NULL;
+            parent->child = NULL;
         }
     } else {
-        purgeTree(Current_node);
-        parent->child=NULL;
+        purgeTree(first_child);
+        parent->child = NULL;
     }
 
 

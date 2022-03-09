@@ -69,13 +69,13 @@ void purgeTree(void *root) {
     free(tmp);
 }
 
+/*
+*	Parse a request $req (of length $len) mapped in the memory
+*/
 int parseur(char *req, int len) {
-    
-    puts("OK");
-
     mem = req;
     no_go_zone = mem + len;
-	createRoot("", NULL, 0);
+	createRoot(FIRST_TAG, req, len);
     int r = construire(FIRST_TAG, getRootTree());
 
     printf("Valid:");

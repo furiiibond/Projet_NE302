@@ -31,6 +31,10 @@ dir:
 # Quick run
 run: all
 	@./$(BIN) test0.txt 0
+	
+# Quick run Simple
+runSimple: all
+	@./$(BIN) testSimple0.txt 0
 
 # Cleaning the files
 clean:
@@ -46,4 +50,4 @@ tar: clean
 	--exclude="$(IGNORE)" "$$dir" --verbose --show-transformed-names
 
 # Ignore non file targets
-.PHONY: all dir run clean tar
+.PHONY: all dir run runSimple clean tar

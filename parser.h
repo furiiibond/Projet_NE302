@@ -32,8 +32,8 @@
 
 #define DEBUG_IO_CONSTRUIRE
 // Global var, used to point the file to parse
-char *mem;
-char *no_go_zone;
+extern char *mem;
+extern char *no_go_zone;
 
 // main fonction that needs to be called from parser
 int construire(char *module, node *parent);
