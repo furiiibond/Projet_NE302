@@ -11,7 +11,8 @@
 #include <ctype.h>
 
 //ABNF Gramm file
-#define ABNF_RULES "allrfc.abnf"
+#define ABNF_RULES "simple.abnf"
+#define FIRST_TAG "message"
 #define CONTENT_LEN 1000
 
 //Print TRUE or FALSE

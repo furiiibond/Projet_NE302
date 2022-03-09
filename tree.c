@@ -112,7 +112,7 @@ void _searchTree(node *start, char *name, _Token **tok) {
  */
 void display_tree(node* noeud, int n) {	//1er appel : noeud=treeRoot, n=0
     for (int i = 0; i < n; i++)
-        printf("\t");
+        printf("  ");
 
     printf("[%d]%s = \"", n, noeud->tag);
     fflush(stdout);
@@ -131,10 +131,10 @@ void display_tree(node* noeud, int n) {	//1er appel : noeud=treeRoot, n=0
         printf("..");
     printf("\"\n");
 
-    if (noeud->brother) {
-        display_tree(noeud->brother, n);
-    }
     if (noeud->child) {
         display_tree(noeud->child, n+1);
+    }
+    if (noeud->brother) {
+        display_tree(noeud->brother, n);
     }
 }

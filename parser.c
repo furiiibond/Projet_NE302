@@ -326,17 +326,17 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 }
 
 /* A déplacer ou vous voulez (peut-etre tree.c)*/
-int viderEmptyBrothers(node* noeud) {
+int deleteEmptyBrothers(node* noeud) {
     if (noeud == NULL)
-        return 1; // failsafe
+        return 1; // safe fail
     if (*(noeud->tag) == '\0') {
         free(noeud);
-        return 0;
+        return 1;
     }
     else {
-        if (! viderEmptyBrothers(noeud->brother))
+        if (deleteEmptyBrothers(noeud->brother))
             noeud->brother = NULL;
-        return 1; // So previous know it's not empty
+        return 0; // So previous know it's not empty
     }
 }
 
@@ -344,10 +344,10 @@ int viderEmptyBrothers(node* noeud) {
 int construire(char *module, node* parent) {
     int valid = 0;
     char *str = content(module);
-#ifdef DEBUG_IO_CONSTRUIRE
-    printf(YELLOW"CONSTRUIRE %s\n"NC, module);
-    printf(YELLOW"str:|%s|\n"NC, str);
-#endif
+	#ifdef DEBUG_IO_CONSTRUIRE
+		printf(YELLOW"CONSTRUIRE %s\n"NC, module);
+		printf(YELLOW"str:|%s|\n"NC, str);
+	#endif
 
     char *debut_value = mem;
 
@@ -355,12 +355,11 @@ int construire(char *module, node* parent) {
     node *Current_node = addNodeAsChild(module, debut_value, 0, parent);
     node *first_child = addNodeAsChild("", debut_value, 0, Current_node);
 
-    /* Procédure d'appel principale */
+    /* Procedure d'appel principale */
     valid = algo0(str, strlen(str), first_child);
 
     if (valid) {
-        if (!viderEmptyBrothers(first_child)) {
-            free(first_child);
+        if (deleteEmptyBrothers(first_child)) {
             Current_node->child = NULL;
         }
     } else {

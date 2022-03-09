@@ -76,10 +76,12 @@ int parseur(char *req, int len) {
     mem = req;
     no_go_zone = mem + len;
 	createRoot("", NULL, 0);
-    int r = construire("HTTP-message",getRootTree());
+    int r = construire(FIRST_TAG, getRootTree());
 
     printf("Valid:");
     truth(r);
 
+	if (r)
+		display_tree(getRootTree(), 0);
     return r;
 }
