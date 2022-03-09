@@ -70,13 +70,13 @@ void purgeTree(void *root) {
 }
 
 int parseur(char *req, int len) {
-    // createRoot("HTTP-message", req, len);
+    
     puts("OK");
 
     mem = req;
     no_go_zone = mem + len;
-
-    int r = construire("HTTP-message");
+	createRoot("", NULL, 0);
+    int r = construire("HTTP-message",getRootTree());
 
     printf("Valid:");
     truth(r);

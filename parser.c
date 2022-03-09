@@ -58,7 +58,7 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node** noeud) {
             while ((*noeud)->brother)
                 (*noeud) = (*noeud)->brother;//get back to the current empty child( the last)
         } else
-            reset_first_child_queue(noeud);
+            reset_first_child_queue(*noeud);
 
         if (res)
             backup = mem;
