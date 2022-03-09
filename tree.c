@@ -97,13 +97,11 @@ void _searchTree(node *start, char *name, _Token **tok) {
     }
     node *cur = start;
 
-    while (cur) {
-        if (cur->child)
-            _searchTree(cur->child, name, tok);
-        if (cur->brother)
-            _searchTree(cur->brother, name, tok);
-        cur = cur->brother;
-    }
+  
+    if (cur->child)
+        _searchTree(cur->child, name, tok);
+    if (cur->brother)
+        _searchTree(cur->brother, name, tok);
 
 }
 

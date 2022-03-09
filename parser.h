@@ -29,8 +29,8 @@
 #define MASK_OCTET 0xFF
 // #define DEBUG
 // #define DEBUG_MEMVIEW
+// #define DEBUG_IO_CONSTRUIRE
 
-#define DEBUG_IO_CONSTRUIRE
 // Global var, used to point the file to parse
 extern char *mem;
 extern char *no_go_zone;

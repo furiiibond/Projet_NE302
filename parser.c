@@ -29,19 +29,19 @@ int matchedCommand(char **ptr, char *end, node **node_ptr) {
 	if (!res)
         mem = backup;
 
-    else{ //Si la construction est un succes on met bien à jour le papa est on crée un nouveau frère pour node_ptr
+    else{ //Si la construction est un succes on met bien à jour le papa et on crée un nouveau frère pour node_ptr
         strcpy((*node_ptr)->tag,command);
         (*node_ptr)->value = backup;
         (*node_ptr)->len_value = mem-backup;
         (*node_ptr) = addNodeAsBrother("", mem, 0, *node_ptr);
     }
 		#ifdef DEBUG
-			printf("res %s: ", command); Truth(res);
+			printf("res %s: ", command); truth(res);
 		#endif
 	return res;
 }
 
-int loopAlgoCalls(int min, int max, char *debut, char *fin, node** noeud) {
+int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 	int res = TRUE;
 	char *backup = mem;
 	char *backup2 = mem; // if we validate less time than min
@@ -57,11 +57,12 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node** noeud) {
 		printf(RED")\n"NC);
         #endif
 
-		res = algo0(debut,fin - debut, *noeud);
+		res = algo0(debut, fin - debut, *noeud);
         if (res) {
             while ((*noeud)->brother)
-                (*noeud) = (*noeud)->brother;//get back to the current empty child( the last)
-        } else
+                (*noeud) = (*noeud)->brother;//get back to the current empty brother( the last)
+        } 
+		else
             reset_first_child_queue(*noeud);
 
         if (res)
@@ -74,7 +75,7 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node** noeud) {
         mem = backup2;
 	#ifdef DEBUG
 		printf("\texit loop with i=%d\n", i);
-		printf("res: "); Truth(res);
+		printf("res: "); truth(res);
 	#endif
 	return res;
 }
@@ -89,13 +90,18 @@ int Matched_crochet(){
 }
 */
 
-void reset_first_child_queue(node* noeud){
+void reset_first_child_queue(node* noeud) {
     noeud->tag[0]='\0';
     noeud->len_value = 0;
-    if(noeud->brother!=NULL){
+    if (noeud->brother) {
         purgeTree(noeud->brother);
-        noeud->brother=NULL;
+        noeud->brother = NULL;
     }
+	if (noeud->child) {
+        purgeTree(noeud->child);
+        noeud->child = NULL;
+    }
+		
 }
 
 int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
@@ -159,7 +165,7 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 				while (! isspace(*++ptr)) ;
 			}
 
-            loopAlgoCalls(x, y, debut_chaine, ptr, &node_ptr);
+            res = loopAlgoCalls(x, y, debut_chaine, ptr, &node_ptr);
 
 			if (*ptr == ')')
                 ptr++;
@@ -262,9 +268,8 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 			ptr++;
 			char *debut = ptr;
 			goto_next(&ptr, end, ')');
-			// printf("stop at:%c,next:%c\n", *ptr, *(ptr+1));
-			res = algo0(debut, ptr - debut,node_ptr);
-            while(node_ptr->brother!=NULL)node_ptr=node_ptr->brother;//get back to the current empty child( the last)
+
+			res = loopAlgoCalls(1, 1, debut, ptr, &node_ptr);
 
 			#ifdef DEBUG
 				printf("Out of parenthesis; current:'%c'\n", *ptr);
@@ -272,14 +277,11 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
             ptr++;
 		} else
 /*----*/if (*ptr == '[') {/* ETAPE 10 ---------------- */
-			char *debut_chaine = ++ptr;
+			char *debut = ++ptr;
 
 			goto_next(&ptr, end, ']');
 
-            int x = 0;
-			int y = 1;
-
-            loopAlgoCalls(x, y, debut_chaine, ptr, &node_ptr);
+            res = loopAlgoCalls(0, 1, debut, ptr, &node_ptr);
 
 			ptr++;
 		}
