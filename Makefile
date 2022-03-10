@@ -12,9 +12,9 @@ SRC=$(wildcard *.c)
 
 OBJS=$(SRC:.c=.o)
 OBJ_PATH=objs/
+TESTSPATH=tests/
 
 BIN=parser
-
 # Rules
 
 # Default Rule
@@ -31,11 +31,11 @@ dir:
 
 # Quick run
 run: all
-	@./tests/$(BIN) test0.txt 0
+	@./$(BIN) $(TESTSPATH)test0.txt 0
 	
 # Quick run Simple
 runSimple: all
-	@./tests/$(BIN) testSimple0.txt 0
+	@./$(BIN) $(TESTSPATH)testSimple0.txt 0
 
 # Cleaning the files
 clean:
