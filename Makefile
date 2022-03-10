@@ -4,7 +4,8 @@ PREFIX=http
 
 # Compilation
 CC=gcc
-FLAGS=-Wall -Wextra -Werror -g
+FLAGS=-Wall -Wextra -g
+#-Werror -g
 
 # Files and directories
 SRC=$(wildcard *.c)
@@ -30,11 +31,11 @@ dir:
 
 # Quick run
 run: all
-	@./$(BIN) test0.txt 0
+	@./tests/$(BIN) test0.txt 0
 	
 # Quick run Simple
 runSimple: all
-	@./$(BIN) testSimple0.txt 0
+	@./tests/$(BIN) testSimple0.txt 0
 
 # Cleaning the files
 clean:

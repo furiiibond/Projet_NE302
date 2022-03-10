@@ -1,8 +1,8 @@
 /*
-Color 0:activated / 1:desactivated
+Color 0:desactivated / 1:activated
 */
 
-#define COLOR 1
+#define COLOR 0
 
 #if COLOR
 	#define RED    "\033[0;31m"

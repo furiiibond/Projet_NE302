@@ -63,7 +63,13 @@ int nocase_memcomp(char *s, char *d, int l) {
     int i = 0;
     while (i < l && (s[i] == d[i] || (isalpha(s[i]) && isalpha(d[i]) && s[i]%32 == d[i]%32)))
         i++;
-
+	#ifdef DEBUG_MEMVIEW
+	printf(RED"___DEBUG___\n");
+	write(STDOUT_FILENO, s, l); puts("");
+	write(STDOUT_FILENO, d, l);
+	truth(i==l);
+	printf("___FIN___\n"NC);
+	#endif
     return (i == l);
 }
 

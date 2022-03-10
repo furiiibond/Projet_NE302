@@ -114,8 +114,18 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 		printf(MAGENTA"Entree dans algo:[");
 		fflush(stdout);
 		write(STDOUT_FILENO, str, len);
-		puts("]"NC);
+		printf("]=[%s]\n"NC,str);
 	#endif
+
+// FIX UTILE A VERIFIER
+char * sauvegarde_pointeur_memoire = mem;
+// ATTENTION AU COMPTE RENDU DE DEMAIN
+// Conclusion ce fix fonctionne et il rend même obsolète
+// d'autre outils de gestion du pointeur mem.
+// Il a d'ailleur permis de valider les test 8 et 3 qui ne marchaient pas
+// On virera les trucs superflu plus tard. 
+
+
 
 	while (ptr < end && *ptr != '\0' && mem < no_go_zone) {
 		#ifdef DEBUG
@@ -223,7 +233,7 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 				mem += res;
 			}
 			#ifdef DEBUG
-				printf("res: "); Truth(res);
+				printf("res: "); truth(res);
 			#endif
 		}
 		else
@@ -257,7 +267,7 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 			ptr += longueur + 1;
 
 			#ifdef DEBUG
-				printf("res: "); Truth(res);
+				printf("res: "); truth(res);
 			#endif
 		}
 		else
@@ -302,6 +312,7 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 					ptr = end - 1;
 				} else {
 					res = TRUE;
+					mem = sauvegarde_pointeur_memoire;
                     node_ptr=first_Child;
                     reset_first_child_queue(node_ptr);
 				}
@@ -310,11 +321,7 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 					//Step n23 Goto '/'
 					goto_next(&ptr, end, '/');
 					if(ptr < end && *ptr == '/')//peut-être que le if n'est même pas nécessaire
-                        ptr--;//Nouveau stuff
-        // /*J'ai commenté la partie en dessous car elle est censé être équivalente au fix ci-dessus (ptr--)*/
-                        //res = TRUE;
-                    //node_ptr=first_Child;
-                    //reset_first_child_queue(node_ptr);
+                        ptr--;
 				}
 			}
 		}
@@ -325,7 +332,7 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 		res = FALSE;
 	}
 	#ifdef DEBUG
-		printf("Return res:"); Truth(res);
+		printf("Return res:"); truth(res);
 	#endif
 
 	return res;
