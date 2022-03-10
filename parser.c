@@ -56,14 +56,19 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 		write(STDOUT_FILENO, debut, fin - debut);
 		printf(RED")\n"NC);
         #endif
-
+		
+		// memory leak fix 1 (more to come)
+		node* bakcup_first_child = *noeud;
+		
 		res = algo0(debut, fin - debut, *noeud);
         if (res) {
             while ((*noeud)->brother)
                 (*noeud) = (*noeud)->brother;//get back to the current empty brother( the last)
         } 
-		else
+		else{
+			*noeud =  bakcup_first_child;
             reset_first_child_queue(*noeud);
+		}
 
         if (res)
             backup = mem;
