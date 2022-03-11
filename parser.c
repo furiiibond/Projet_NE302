@@ -63,6 +63,11 @@ int matchedCommand(char **ptr, char *end, node **node_ptr) {
 	return res;
 }
 
+
+/* ------------- LOOP ------------- */
+/* Cette fonction permet de faciliter les répétitions d'appels à algo0()
+	Elle est principalement utilisée pour les chiffres / * / ( ) / [ ]
+*/
 int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 	// Initialisation de res la variable qui contiendra le résultat à retourner
 	int res = TRUE;
@@ -97,16 +102,27 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 		else{
 			//Si le resultat est faux, on veux supprimer tous les frère/fils qui auraient été créé
 /* /!\/!\ */*noeud =  bakcup_first_child;//noeud ne peut pas être modifié par algo donc cette ligne est inutile
-            //on transforme donc le noeud pointé par noeud en élément vide et on supprime toute son arborescence
+            //on transforme donc le noeud pointé par *noeud en élément vide et on supprime toute son arborescence
 			reset_first_child_queue(*noeud);
 		}
-
+		
+		//Si le résultat est vrai on fait un nouveau backup pour que le dernier faux qui soit renvoyé
+		//puisse rollback à l'avant dernière itération sans perdre tout le progrès
         if (res)
             backup = mem;
+		//On incrémente le nombre de loop validée si res est vrai
 		i += res;
 	}
+	//On restore le backup
+	//		Si on est sortit du while car res est faux il est nécessaire de restorer le pointeur pour que 
+	//		le reste du parsing puisse se dérouler correctement
+	//		Si on est sorti car on à atteint le nombre max d'ittération alors le pointeur mem
+	//		n'a pas été modifié entre temps et cette ligne n'a aucun effet.
     mem = backup;
+	//On vérifie si le nombre de validation est bien compris entre min et max (inclus) 
 	res = (i >= min) && (i <= max);
+	//Si le résultat final est faux, on restore le tout premier backup de la mémoire pour annuler toutes
+	//les modifiactions faites à mem
 	if (!res)
         mem = backup2;
 	
@@ -123,9 +139,16 @@ int Matched_crochet(){
 }
 */
 
+
+/* Cette fonction transforme l'element pointé par noeud en élément vide
+	puis purge l'arbre à partir de cet élément
+*/
 void reset_first_child_queue(node* noeud) {
+	//rend l'élément "vide"
     noeud->tag[0]='\0';
     noeud->len_value = 0;
+	/*Ce serait bien si on pouvait appeler purgeTree() sur NULL*/
+	//Purge a partir du brother et child s'ils existent
     if (noeud->brother) {
         purgeTree(noeud->brother);
         noeud->brother = NULL;
@@ -137,6 +160,12 @@ void reset_first_child_queue(node* noeud) {
 		
 }
 
+
+/** Si il y a bien une fonction à bien expliquer, c'est celle-là.
+	L'idée est d'avoir un pointeur qui parcour la chaine de charactère
+	correspondant à la ligne de la grammaire abnf que nous somme en train d'analyser.
+	On prend ensuite des décisions en fonction des charactères lu au fur et à mesure.
+**/
 int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 	char *ptr, *end;
     node * node_ptr = first_Child;
