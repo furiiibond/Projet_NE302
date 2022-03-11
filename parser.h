@@ -20,16 +20,17 @@
 // Lib annexes (not used yet ?)
 #include <sys/types.h>
 #include <unistd.h>
+
 // Constants
 #define TRUE 1
 #define FALSE 0
 #define MAX_ITER 0xFFFF
 #define MIN_ITER 0
-
 #define MASK_OCTET 0xFF
-// #define DEBUG
-// #define DEBUG_MEMVIEW
-// #define DEBUG_IO_CONSTRUIRE
+
+//Parametres (inclus les debug flags)
+#include "parametres.h"
+
 
 // Global var, used to point the file to parse
 extern char *mem;

@@ -6,12 +6,13 @@
 #include <string.h>
 #include "api.h"
 
-// nb of char displayed by line in display_tree()
-#define DISPLAY_MAX 30
+//Constants defined here
+#include "parametres.h"
+
 
 // represents a node in the tree
 typedef struct node {
-    char tag[50];
+    char tag[TAG_LEN];
     char* value; // pointer to the first char of the value
     int len_value;  // number of char starting from pointer value
     struct node *child; // pointer to the first child or NULL

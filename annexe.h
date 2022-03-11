@@ -10,12 +10,7 @@
 #include <string.h>
 #include <ctype.h>
 
-//ABNF Gramm file
-#define ABNF_RULES "allrfc.abnf"
-#define FIRST_TAG "HTTP-message"
-
-//Maximum rule line size
-#define CONTENT_LEN 1000
+#include "parametres.h"
 
 //Print TRUE or FALSE
 void truth(int b);

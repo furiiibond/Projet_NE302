@@ -6,38 +6,60 @@ char *mem;
 char *no_go_zone;
 
 /* ------------- ETAPE 1 ------------- */
+/* Cette fonction est appellé quand algo0() rencontre un charactère alphanumérique 
+	(ce qui correspond à un tag de la grammaire abnf)
+	Le but de cette fonction est donc d'appller la fonction construire sur ce tag.
+*/
 int matchedCommand(char **ptr, char *end, node **node_ptr) {
+	// Initialisation de res la variable qui contiendra le résultat à retourner
 	int res = TRUE;
-		#ifdef DEBUG
-		printf("Matched a letter !\n");
-		#endif
+	
+	//debut est un pointeur vers la première lettre du tag (le début du mot, d'où le nom)
 	char * debut = (*ptr);
+	//pour avoir la fin du mot il suffit d'avancer le pointeur *ptr jusqu'au prochain espace
+	//(dans la grammaire tous les éléments sont séparés par des espace)
 	while (*ptr < end && !isspace(*++(*ptr))) ;
 
-	char command[50];
+	// On déclare un tableau de char de taille fixe pour contenir le tag qu'on veut
+	// passer en paramètre à la fonction construire().
+	char command[TAG_LEN];
+	//On peut calculer la longueur du tag facilement car *ptr pointe sur le char n+1 du mot
+	//et debut sur le char 1 donc *ptr - debut = x+n+1 - x+1 = n.
 	int longueur = ((*ptr) - debut);
+	//On copie donc le tag dans le buffer command.
 	memcpy(command, debut, longueur);
+	//Et on ajoute un \0 à la fin de la chaine car toutes les strings doivent finir par un character nul (EOL ?)
 	command[longueur] = '\0';
-		#ifdef DEBUG
-			printf(BLUE "cmd_> %s\n"NC" ",command);
-		#endif
+	
+	// Ici on sauvegarde le pointeur vers le current char du fichier à parser
+	// car si jamais construire n'est pas validé, il risque d'avoir modifié ce pointeur
+	// et c'est à la fonction appellante de le restorer.
 	char* backup = mem;
 
-/** ####### APPEL RECURSIF ##################*/
-/** #####*/	res = construire(command,*node_ptr); /**####*/
-/** #########################################*/
+// Le coeur de l'algorithme, on appelle construire avec en parametre le tag à évaluer
+// ainsi qu'un pointeur vers le noeud de l'arbre ou nous nous situons actuellement
+// (Exemple: si on évalue le tag start-line, on passe à construire un pointeur vers 
+//  le noeud avec l'étiquette start-line et construire() s'occupera de créer ses fils
+//  ou ne fera rien si le résultat est faux.
+/** ############# ~~ APPEL RECURSIF ~~ ##################*/
+/** #####*/	res = construire(command,*node_ptr); /**#####*/
+/** #####################################################*/
+	
 	if (!res)
+	//Si le resultat est faux, on restore le pointeur vers la mémoire qui à été sauvegardé précédement
         mem = backup;
-
-    else{ //Si la construction est un succes on met bien à jour le papa et on crée un nouveau frère pour node_ptr
+    else{ 
+	//Si la construction est un succes on met bien à jour le papa 
         strcpy((*node_ptr)->tag,command);
+		//On utilise la sauvegarde "backup" pour définir le début du contenu 
+		//Et on calcule la longueur de la même manière que précédemment
         (*node_ptr)->value = backup;
         (*node_ptr)->len_value = mem-backup;
+	//et on crée un nouveau frère "vide" pour node_ptr
         (*node_ptr) = addNodeAsBrother("", mem, 0, *node_ptr);
     }
-		#ifdef DEBUG
-			printf("res %s: ", command); truth(res);
-		#endif
+	
+	//On retourne le résultat renvoyé par construire()
 	return res;
 }
 
@@ -47,20 +69,12 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 	char *backup2 = mem; // if we validate less time than min
 	int i = 0;
 	while (i < max && res) {
-		#ifdef DEBUG_MEMVIEW
-		printf(CYN"tmp:%c\n"NC, *mem);
-		#endif
-		#ifdef DEBUG_IO_CONSTRUIRE
-		printf(RED"Call>_algo0("NC);
-        fflush(stdout);
-		write(STDOUT_FILENO, debut, fin - debut);
-		printf(RED")\n"NC);
-        #endif
-		
+				
 		// memory leak fix 1 (more to come)
 		node* bakcup_first_child = *noeud;
 		
 		res = algo0(debut, fin - debut, *noeud);
+		
         if (res) {
             while ((*noeud)->brother)
                 (*noeud) = (*noeud)->brother;//get back to the current empty brother( the last)
@@ -78,10 +92,7 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 	res = (i >= min) && (i <= max);
 	if (!res)
         mem = backup2;
-	#ifdef DEBUG
-		printf("\texit loop with i=%d\n", i);
-		printf("res: "); truth(res);
-	#endif
+	
 	return res;
 }
 /*
