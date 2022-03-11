@@ -12,7 +12,7 @@ char *no_go_zone;
 */
 int matchedCommand(char **ptr, char *end, node **node_ptr) {
 	// Initialisation de res la variable qui contiendra le résultat à retourner
-	int res = TRUE;
+	int res = TRUE;//pas nécessaire d'initialiser à TRUE
 	
 	//debut est un pointeur vers la première lettre du tag (le début du mot, d'où le nom)
 	char * debut = (*ptr);
@@ -64,24 +64,41 @@ int matchedCommand(char **ptr, char *end, node **node_ptr) {
 }
 
 int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
+	// Initialisation de res la variable qui contiendra le résultat à retourner
 	int res = TRUE;
+	
+	//On va faire deux backup mémoire,
+	//		Un pour restorer dès que res sera faux
+	//		Un pour restorer si on a validé res moins de fois que min
 	char *backup = mem;
 	char *backup2 = mem; // if we validate less time than min
+	
 	int i = 0;
 	while (i < max && res) {
 				
-		// memory leak fix 1 (more to come)
-		node* bakcup_first_child = *noeud;
+		// On backup le pointeur vers le noeud vide actuel.
+		// Si on ne valide pas un appel à algo0(), on restore ce pointeur et on supprime tout
+		// memory leak fix 1 (more to come) EDIT:CA N'A RIEN FIXE DU TOUT EN FAIT, INUTILE
+/*/!\*/	node* bakcup_first_child = *noeud;
 		
-		res = algo0(debut, fin - debut, *noeud);
+		/** ############# ~~ APPEL ITERATIF ? ~~ ##################*/
+		/** ###*/ res = algo0(debut, fin - debut, *noeud);  /** ###*/ 
+		/** #######################################################*/
+        
 		
-        if (res) {
+		if (res) {
+		//On déplace le pointeur de noeud vers le dernier frère vide
+		//On est onligé de le faire nous-même car algo0 n'est pas conçu pour modifier un pointeur d'arbre
+		//On lui passe uniquement (ce qu'elle considérera comme) le premier frère en paramètre.
+		//Ce frère existera toujours, peu importe le résultat.
             while ((*noeud)->brother)
-                (*noeud) = (*noeud)->brother;//get back to the current empty brother( the last)
+                (*noeud) = (*noeud)->brother;//get to the current empty brother( the last)
         } 
 		else{
-			*noeud =  bakcup_first_child;
-            reset_first_child_queue(*noeud);
+			//Si le resultat est faux, on veux supprimer tous les frère/fils qui auraient été créé
+/* /!\/!\ */*noeud =  bakcup_first_child;//noeud ne peut pas être modifié par algo donc cette ligne est inutile
+            //on transforme donc le noeud pointé par noeud en élément vide et on supprime toute son arborescence
+			reset_first_child_queue(*noeud);
 		}
 
         if (res)
@@ -386,6 +403,13 @@ int construire(char *module, node* parent) {
 
     /* Procedure d'appel principale */
     valid = algo0(str, strlen(str), first_child);
+
+/** IDEE: Refaire les dépendances
+		Ex: Algo0-> TRUE = renvoie un arbre valide
+					FALSE = renvoie un élément vide
+		construire->TRUE = arbre valide descendant de parent
+					FALSE = arbre vide parent->child = NULL
+**/
 
     if (valid) {
         if (deleteEmptyBrothers(first_child)) {
