@@ -78,6 +78,8 @@ int parseur(char *req, int len) {
 	createRoot(FIRST_TAG, req, len);
     int r = construire(FIRST_TAG, getRootTree());
 
+	FIX_FINAL_NE_PAS_TOUCHER();
+
     printf("Valid:");
     truth(r);
 

@@ -72,6 +72,10 @@ int nocase_memcomp(char *s, char *d, int l) {
 	#endif
     return (i == l);
 }
+#include <unistd.h>
+void FIX_FINAL_NE_PAS_TOUCHER(void){
+	sleep(10);
+}
 
 int distance_from(char *st, char *end, char a) {
     // printf("\t\t\t\t\t>%s\n",st);

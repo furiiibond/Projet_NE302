@@ -113,6 +113,7 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 		//On incrémente le nombre de loop validée si res est vrai
 		i += res;
 	}
+	
 	//On restore le backup
 	//		Si on est sortit du while car res est faux il est nécessaire de restorer le pointeur pour que 
 	//		le reste du parsing puisse se dérouler correctement
@@ -160,6 +161,43 @@ void reset_first_child_queue(node* noeud) {
 		
 }
 
+int Boucle1(int x, int y, char **ptr, char *end, node** node_ptr){
+	
+	//on déplace le pointeur après les chiffres/étoile
+	while (!isspace(*++*ptr)){;}
+	//on mange les espaces, pour mettre le pointeur sur
+	//le premier char du morceau de règles à looper
+	while (isspace(*++*ptr)){;}
+	
+	//On sauvegarde le début de la chaine 
+	char* debut_chaine = *ptr;
+
+	if (**ptr == '(') {
+		//Etape n°33
+		debut_chaine++; //if debut_chaine -> '(' on l'incr pour qu'il pointe sur le vrai debut de la chaine
+		(*ptr)++; // de même pour ptr sinon il pointe sur '('
+		//La fonction got_next() emmene le pointeur directement à la fin de la parenthese
+		goto_next(ptr, end, ')');
+	}
+	else {
+		//Etape n°32
+		//Comme il n'y a pas de parentheses, la boucle s'applique uniquement au mot qui suit
+		while (! isspace(*++*ptr)) ;
+	}
+
+	//appel à la fonction de boucle qui renverra la validité du morceaux de règle en fonction de x et y
+	// (elle remplie aussi l'arbre)
+	int res = loopAlgoCalls(x, y, debut_chaine, *ptr, node_ptr);
+
+	// on est pas forcément obligé de faire un if ici
+	// je pense que peut importe le cas l'incrémenter ne devrait pas être néfaste
+	if (**ptr == ')')
+		(*ptr)++;
+	
+	return res;
+}
+
+
 
 /** Si il y a bien une fonction à bien expliquer, c'est celle-là.
 	L'idée est d'avoir un pointeur qui parcour la chaine de charactère
@@ -188,214 +226,253 @@ char * sauvegarde_pointeur_memoire = mem;
 // On virera les trucs superflu plus tard. 
 
 
-
+/*	Cette boucle while premet de parcourir le contenu de la règle abnf passé en parametre (str)
+	on déplace juste un pointeur ptr le long de cette chaine en exécutant les action correspondantes
+	à chaque cas rencontrés.
+	Les conditions d'arrêt sont,soit: on est arrivé à la fin de str ('\0' ou ptr >=end)
+								soit: le pointeur memoire est dans une zone illégale (panic) */
 	while (ptr < end && *ptr != '\0' && mem < no_go_zone) {
-		#ifdef DEBUG
-			printf("Current scan: [%c]\n", *ptr);
-		#endif
-
-/*----*/if (isalpha(*ptr)) {/* ETAPE 1 ------------- */
-
+		/* Ici on "switch" *ptr et selon le "case",
+			on effectue les actions correspondantes */
+		/* Les numéros d'étape correspondes à la
+		numérotation du flowchart fournis en annexe */
+/*----*/if (isalpha(*ptr)) {/* ETAPE 1 ---------------- */
+			//On rencontré une lettre, il s'agit donc
+			//d'un appel à une nouvelle règle de la grammaire abnf
             res = matchedCommand(&ptr, end, &node_ptr);
 		}
 		else
-/*----*/if (isdigit(*ptr) || *ptr=='*') {/* ETAPE 3  */
+/*----------------- ETAPE 3 --------------------------- */
+			//Si on match un chiffre ou une * c'est qu'on va faire un boucle
+			//On veut donc mettre a jour notre min et max nombre d'iteration (x et y)
+			//Puis déterminer le morceau de règles à looper (boucler ?)
+			//Avant d'appeller la fonction loopAlgoCalls()
+		if (isdigit(*ptr) ) {/* Etape 30a */
+			int x, y;
+			y = MAX_ITER;
+			
+			/* Etape 31a */
+			//Si c'est un chiffre on regarde s'il y a une étoile
+			sscanf(ptr, "%d*%d", &x, &y);
+			
+			//Le code ci_dessous ne fonctionne que si le premier nombre est un chiffre (1 char)
+			if (*(ptr + 1) != '*') //Si le char après le digit n'est pas une * (c'est le cas "N blabla")
+				y = x;// On validera la boucle exactement N fois 
+
+			//fonction cool
+			res = Boucle1(x,y,&ptr,end,&node_ptr);
+
+		} else if (*ptr=='*') {/* Etape 30b */
+			
 			int x, y;
 			y = MAX_ITER;
 			x = MIN_ITER;
-
-			if (isdigit(*ptr)) {
-				#ifdef DEBUG
-				printf("Matched a digit\n");
-				#endif
-				sscanf(ptr, "%d*%d", &x, &y);
-				if (*(ptr + 1) != '*')
-					y = x;
-			} else {
-				#ifdef DEBUG
-				printf("Matched a '*'\n");
-				#endif
-				sscanf(ptr, "* %d", &y);
-			}
-			while (!isspace(*++ptr)){;}
-			while (isspace(*++ptr)){;}
-			#ifdef DEBUG
-				printf(BLUE"\tnext:[%c]\n"NC, *ptr);
-				printf("\tx:%d / y:%d\n", x, y);
-			#endif
-
-			char* debut_chaine = ptr;
-
-			if (*ptr == '(') {
-				//Etape n°33
-				debut_chaine++; //if debut_chaine -> '(' on l'incr pour qu'il pointe sur le vrai debut de la chaine
-				ptr++; // de même pour ptr sinon il pointe sur '('
-				goto_next(&ptr, end, ')');
-			}
-            else {
-				//Etape n°32
-				while (! isspace(*++ptr)) ;
-			}
-
-            res = loopAlgoCalls(x, y, debut_chaine, ptr, &node_ptr);
-
-			if (*ptr == ')')
-                ptr++;
+			
+			/* Etape 31b */
+			//Si c'est une étoile on regarde si il y a un nombre après
+			sscanf(ptr, "* %d", &y);//Il faudrait pas enlever l'espace ici (entre * et %d) ?
+			
+			//fonction cool
+			res = Boucle1(x,y,&ptr,end,&node_ptr);
+		
+		
 		}
 		else
 /*----*/if (*ptr == '%') { /* ETAPE 4 ----------------- */
-			#ifdef DEBUG
-			printf("Matched '%%' !\n");
-			#endif
+			//On pointe sur un %, il faut valider (ou pas)
+			//Le(s) code(s) ascii qui suivent le x
 			ptr ++;
+			//on verrifie qu'il y a bien un x (toujours le cas normalement)
 			assert(*ptr == 'x');
-			#ifdef DEBUG
-			puts("\tx is there, good.");
-			#endif
-
+			
+			// A ce moment ptr pointe sur le 'x', donc ptr+3 pointe sur
+			//le char juste après le code hexa (soit un '.', soit un '-', soit un ' ')
 			if (*(ptr + 3) == '.') {
-				/*Si: %xHH.HH.HH...*/
-				#ifdef DEBUG
-				puts("\tdetected pattern: HH.HH...");
-				#endif
-				int nb;
-				char *mem_bak = mem;
+				/*Si il y a un point on est dans le cas:
+					%xHH.HH.HH...
+				*/
+				
+				uint8_t nb;
+				char *mem_bak = mem;// sauvegarde du pointeur memoire (pas utile ?)
+				//Tant qu'il rest des HH à scanner, que res est vrai, et que le pointeur mem est correct
 				while(!isspace(*ptr) && res && mem < no_go_zone) {
-					sscanf(ptr + 1, "%x", &nb);
-					#ifdef DEBUG_MEMVIEW
-						printf("\t\twhl ptr:%c\n",*(ptr));
-						printf("\t\tmem: %c %x | ptr: %c %x\n", *mem, *mem, nb, nb);
-					#endif
+					//on scan la valeur ascii
+					sscanf(ptr + 1, "%hhx", &nb);
+					//et si mem pointe un char qui valide le code nd
 					res = (*mem == nb);
+					// alors on incrémente mem
 					mem += res;
+					//on avance ptr de 3 pour aller lire le prochain (on saute ".HH")
                     ptr += 3;
 				}
-				if (!res) {
+				
+				if (!res) {//Si res est faux on restore mem (pas utile ?)
                     mem = mem_bak;
                 }
             }
             else {
-				/*Si: %xHH-HH ou %xHH */
-				#ifdef DEBUG
-				printf("\tdetected pattern: HH-HH\n");
-				#endif
-				u_int8_t h1, h2;
+				/*Sinon on est dans le cas:
+					%xHH-HH     ou	   %xHH
+				*/
+				
+				uint8_t h1, h2;
+				//on remplit h1 et h2 
 				sscanf(ptr + 1,"%hhx-%hhx", &h1, &h2);
-
+				
+				//si il y a un tiret après HH
 				if (*(ptr + 3) == '-')
-                    ptr += 6;
+                    ptr += 6;//On avance de 6 (on saute "xHH-HH")
 				else{
-                    ptr += 3;
-                    h2 = h1;
+                    ptr += 3;//Sinon on avance de 3 (on saute "xHH")
+                    h2 = h1;// c'est pour le test juste après
                 }
-				#ifdef DEBUG_MEMVIEW
-					printf("\t\th1:%x h2:%x | mem:%x %c\n", h1, h2, *mem, *mem);
-				#endif
+				
+				// on check si *mem est compris entre h1 et h2
 				res = ((*mem & MASK_OCTET) >= h1) && ((*mem & MASK_OCTET) <= h2);
-				mem += res;
+				mem += res;//on incrémente mem adéquatement (si res == 1)
 			}
-			#ifdef DEBUG
-				printf("res: "); truth(res);
-			#endif
+			
 		}
 		else
 /*----*/if (*ptr == '"') { /* ETAPE 5 ----------------- */
-			#ifdef DEBUG
-				printf("Matched '\"'\n");
-			#endif
-			ptr++;
+			// On match des guillemets, on veut donc comparer une chaine de charactères
+			
+			
+			ptr++;//valeur à l'addresse de ptr égale ptr plus 1 point virgule
+			
+			//on cherche la longueur de la chaine (jusqu'au prochain guillemet)
 			int longueur = distance_from(ptr, end, '"');
+			
+			//si mem + taille de la chaine sort de la zone mémoire attribué à la requête à parser
 			if (mem + longueur >= no_go_zone)
-				res = FALSE;
+				res = FALSE;//ON EXIT EN URGENCE
 			else
+			//sïnon on compare (case insensitive) la chaine avec la zone de taille longueur pointé par mem
 				res = nocase_memcomp(ptr, mem, longueur);
-			#ifdef DEBUG_MEMVIEW
-                printf("\t[");
-                fflush(stdout);
-                write(STDOUT_FILENO, ptr, longueur);
-                printf("]\n\t[");
-                fflush(stdout);
-                write(STDOUT_FILENO, mem,longueur);
-                puts("]");
-            #endif
-
+			
+			//si resultat est vrai
             if (res) {
+				//dans la feuille de l'arbre correspondante, on copie le tag ("case_insensitnve striong")
                 strcpy(node_ptr->tag, "case_insensitive_string");
                 node_ptr->value = mem;
                 node_ptr->len_value = longueur;
                 mem += longueur;
+				//on crée un nouveau frère vide
                 node_ptr = addNodeAsBrother("", mem, 0, node_ptr);
             }
+			//on incrémente ptr
 			ptr += longueur + 1;
 
-			#ifdef DEBUG
-				printf("res: "); truth(res);
-			#endif
 		}
 		else
-/*----*/if (*ptr == '(') {/* ETAPE 9 ----------------- */
-			#ifdef DEBUG
-				printf("Matched '('\n");
-			#endif
+/*----*/if (*ptr == '(') {/*  ETAPE 9 ----------------- */
+			//c'est une parenthese, on veut valider une et unique fois
+			// son contenu
 			ptr++;
 			char *debut = ptr;
 			goto_next(&ptr, end, ')');
 
 			res = loopAlgoCalls(1, 1, debut, ptr, &node_ptr);
 
-			#ifdef DEBUG
-				printf("Out of parenthesis; current:'%c'\n", *ptr);
-			#endif
             ptr++;
 		} else
 /*----*/if (*ptr == '[') {/* ETAPE 10 ---------------- */
+			//c'est des crochets
+			//on veut valider ce qu'il y a entre crochet 0 ou 1 fois
 			char *debut = ++ptr;
-
 			goto_next(&ptr, end, ']');
-
+			//on loop entre 0 et 1 fois
             res = loopAlgoCalls(0, 1, debut, ptr, &node_ptr);
-
+			//res = TRUE
 			ptr++;
 		}
 		else if (*ptr == ')') {
-            #ifdef DEBUG
-                printf("ptr-20:%s\n", ptr - 20);
-                printf(YELLOW"str:(%s)\n"NC, str);
-            #endif
+            //ERREUR
+			//MAIS C'EST PAS POSSIBLE !!
 			perror("Parsing error on parenthesis");
+			/*  Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				Mais si c'est possible avec la carte kiwi
+				Pour les enfants de moins de 16 ans
+				Et ceux qui l'accompagnent jusqu'à
+				4 PERsonnes , payent tous moitié prix.
+				MOITIé PRIX !? C'est PAS POSSIBle !
+				*/
 			exit(1);
 		}
 
 /* ---- ETAPE 2 ---------------------------------- */
-		{
+/*Acol*/{/*ade inutile /!\ */
 			if (*ptr=='/') {
 				if (res) {
 					//WHILE EXIT (return res)
+					//En fait on met ptr = fin comme ça on sort directement du while
 					ptr = end - 1;
 				} else {
 					res = TRUE;
+					//on restore mem
 					mem = sauvegarde_pointeur_memoire;
                     node_ptr=first_Child;
+					//On encule tous les frères/enfants créés.
                     reset_first_child_queue(node_ptr);
 				}
-			} else {
-				if (!res) {
+			} else {//Pas de slash (c'est un ET) donc on continue
+				if (!res) {//par contre si le résultat est faux
 					//Step n23 Goto '/'
+					//on va au prochain /
 					goto_next(&ptr, end, '/');
 					if(ptr < end && *ptr == '/')//peut-être que le if n'est même pas nécessaire
                         ptr--;
 				}
 			}
-		}
+/*Acol*/}/*ade inutile /!\ */
+		
 		ptr++;
-	}
+	}//FIN DU WHILE()
+	
 	if (mem > no_go_zone) {
 		perror("mem pointer out of range");
 		res = FALSE;
 	}
-	#ifdef DEBUG
-		printf("Return res:"); truth(res);
-	#endif
+	
 
 	return res;
 }
@@ -419,10 +496,7 @@ int deleteEmptyBrothers(node* noeud) {
 int construire(char *module, node* parent) {
     int valid = 0;
     char *str = content(module);
-	#ifdef DEBUG_IO_CONSTRUIRE
-		printf(YELLOW"CONSTRUIRE %s\n"NC, module);
-		printf(YELLOW"str:|%s|\n"NC, str);
-	#endif
+	
 
     char *debut_value = mem;
 
@@ -433,6 +507,7 @@ int construire(char *module, node* parent) {
     /* Procedure d'appel principale */
     valid = algo0(str, strlen(str), first_child);
 
+/** /!\/!\ IMPORTANT /!\/!\ **/
 /** IDEE: Refaire les dépendances
 		Ex: Algo0-> TRUE = renvoie un arbre valide
 					FALSE = renvoie un élément vide
@@ -450,16 +525,6 @@ int construire(char *module, node* parent) {
     }
 
 
-
-	#ifdef DEBUG_IO_CONSTRUIRE
-		if (valid)
-            printf(GREEN"Nice"NC" (exiting:%s)\n", module);
-		else
-            printf(RED"Not nice"NC" (exiting:%s)\n", module);
-		// write(STDOUT_FILENO,debut_value,mem-debut_value); printf("[EOL]\n");
-		write(STDOUT_FILENO, mem, 20);
-        printf("[EOL]\n");
-	#endif
 
 	free(str);
 

@@ -7,6 +7,7 @@
 //Lib nécessaires
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -26,5 +27,9 @@ int distance_from(char *st, char *end, char a);
 
 //Move pointer $ptr to the next matching char $a while avoiding () [] and "" and also not going past $end
 void goto_next(char **ptr, char *end, char a);
+
+//Fix tous les petits problèmes
+/* /!\ TRèS INSTABLE /!\ */
+void FIX_FINAL_NE_PAS_TOUCHER(void);
 
 #endif

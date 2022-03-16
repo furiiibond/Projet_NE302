@@ -39,6 +39,8 @@ extern char *no_go_zone;
 // main fonction that needs to be called from parser
 int construire(char *module, node *parent);
 
+
+//things that shouldn't be there :(
 int algo0(char *str, int len, node *first_Child);
 
 void reset_first_child_queue(node* noeud);
