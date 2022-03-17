@@ -2,7 +2,7 @@
 
 void truth(int b) {
     if (b)
-        printf(GREEN"TRUE\n"NC);
+        printf(GRN"TRUE\n"NC);
     else
         printf(RED"FALSE\n"NC);
 }
@@ -74,7 +74,7 @@ int nocase_memcomp(char *s, char *d, int l) {
 }
 #include <unistd.h>
 void FIX_FINAL_NE_PAS_TOUCHER(void){
-	sleep(10);
+	sleep(1);
 }
 
 int distance_from(char *st, char *end, char a) {

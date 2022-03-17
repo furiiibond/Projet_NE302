@@ -3,11 +3,9 @@
 #include "tree.h"
 
 /*
- *      Returns the pointer to the global root
- */
-void *getRootTree() {
-    return getTreeRoot();
-}
+	getRootTree(), purgeTree(),
+	définies dans tree.h
+*/
 
 /*
  *      Search for all the nodes matching the tag = name
@@ -54,20 +52,6 @@ void purgeElement(_Token **r) {
     }
 }
 
-/*
- *      Free all the structure node (http tree)
- */
-void purgeTree(void *root) {
-    struct node *tmp = root;
-    node *child = tmp->child;
-    while (child) {
-        node *next = child->brother;
-        purgeTree(child);
-        child = next;
-    }
-
-    free(tmp);
-}
 
 /*
 *	Parse a request $req (of length $len) mapped in the memory

@@ -129,16 +129,7 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 	
 	return res;
 }
-/*
-int Matched_digit(char** ptr, char *end){
-}
 
-int Matched_star(char** ptr, char *end){
-}
-
-int Matched_crochet(){
-}
-*/
 
 
 /* Cette fonction transforme l'element pointé par noeud en élément vide
@@ -210,12 +201,7 @@ int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
 	int res = TRUE;
 	ptr = str;
 	end = str + len;
-	#ifdef DEBUG
-		printf(MAGENTA"Entree dans algo:[");
-		fflush(stdout);
-		write(STDOUT_FILENO, str, len);
-		printf("]=[%s]\n"NC,str);
-	#endif
+	
 
 // FIX UTILE A VERIFIER
 char * sauvegarde_pointeur_memoire = mem;
@@ -375,7 +361,8 @@ char * sauvegarde_pointeur_memoire = mem;
 			res = loopAlgoCalls(1, 1, debut, ptr, &node_ptr);
 
             ptr++;
-		} else
+		}
+		else
 /*----*/if (*ptr == '[') {/* ETAPE 10 ---------------- */
 			//c'est des crochets
 			//on veut valider ce qu'il y a entre crochet 0 ou 1 fois
@@ -460,7 +447,9 @@ char * sauvegarde_pointeur_memoire = mem;
 					//on va au prochain /
 					goto_next(&ptr, end, '/');
 					if(ptr < end && *ptr == '/')//peut-être que le if n'est même pas nécessaire
-                        ptr--;
+                        ptr--;/* On décrémente ptr parcequ'il va être incrémenté juste après
+								 et du coup à la prochaine boucle on exécutera bien le code
+								 correspondant au "OU" ('/') */
 				}
 			}
 /*Acol*/}/*ade inutile /!\ */
@@ -480,7 +469,7 @@ char * sauvegarde_pointeur_memoire = mem;
 /* A déplacer ou vous voulez (peut-etre tree.c)*/
 int deleteEmptyBrothers(node* noeud) {
     if (noeud == NULL)
-        return 1; // safe fail
+        return 1; // failsafe (si il n'y a pas de fr`re vide, ce qui ne devrait jamais arriver)
     if (*(noeud->tag) == '\0') {
         free(noeud);
         return 1;
@@ -507,12 +496,12 @@ int construire(char *module, node* parent) {
     /* Procedure d'appel principale */
     valid = algo0(str, strlen(str), first_child);
 
-/** /!\/!\ IMPORTANT /!\/!\ **/
-/** IDEE: Refaire les dépendances
-		Ex: Algo0-> TRUE = renvoie un arbre valide
-					FALSE = renvoie un élément vide
-		construire->TRUE = arbre valide descendant de parent
-					FALSE = arbre vide parent->child = NULL
+
+/** IDEE: Refaire les dépendances [DONE]
+		Ex: Algo0-> TRUE = renvoie un arbre valide (avec un élem vide)  <-c'est fait
+					FALSE = renvoie un élément vide						<-idem
+		construire->TRUE = arbre valide descendant de parent  	<-c'est fait
+					FALSE = arbre vide parent->child = NULL		<-idem
 **/
 
     if (valid) {

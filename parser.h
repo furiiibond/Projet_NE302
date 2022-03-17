@@ -7,9 +7,7 @@
     typedef uint8_t u_int8_t;
 #endif
 
-#ifndef COLOR
 #include "color.h"
-#endif
 
 #include "tree.h"
 // Lib nécessaires

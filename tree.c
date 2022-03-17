@@ -1,12 +1,36 @@
 #include "tree.h"
 
+//Couleurs pour l'arbre
+#include "color.h"
+#define C_LVL YEL
+#define C_TAG CYN
+#define C_STR GRN
+
+//Profondeur maximale de la fonction display
+#define MAX_DEPTH 1
+
 node* treeRoot = NULL; // global
 
 /*
  *      Returns the pointer to the global root
  */
-void *getTreeRoot() {
+void *getRootTree() {
     return treeRoot;
+}
+
+/*
+ *      Free all the structure node (http tree)
+ */
+void purgeTree(void *root) {
+    struct node *tmp = root;
+    node *child = tmp->child;
+    while (child) {
+        node *next = child->brother;
+        purgeTree(child);
+        child = next;
+    }
+
+    free(tmp);
 }
 
 /*
@@ -112,7 +136,7 @@ void display_tree(node* noeud, int n) {	//1er appel : noeud=treeRoot, n=0
     for (int i = 0; i < n; i++)
         printf("  ");
 
-    printf("[%d:%s] = \"", n, noeud->tag);
+    printf("["C_LVL"%d"NC":"C_TAG"%s"NC"] = \""C_STR, n, noeud->tag);
     fflush(stdout);
     int len = noeud->len_value;
     if (len >= DISPLAY_MAX)
@@ -122,14 +146,14 @@ void display_tree(node* noeud, int n) {	//1er appel : noeud=treeRoot, n=0
         if (noeud->value[i] != '\n' && noeud->value[i] != '\r')
             putchar(noeud->value[i]);
         else
-            putchar('_'); // in order to actually see the CRLF without a line feed
+            putchar('_'); // in order to actually see the CRLF
         i++;
     }
     if (len < noeud->len_value) // to reduce the char printed if the string is too long
         printf("..");
-    printf("\"\n");
+    printf(NC"\"\n");
 
-    if (noeud->child) {
+    if (noeud->child && n<MAX_DEPTH) {
         display_tree(noeud->child, n+1);
     }
     if (noeud->brother) {
