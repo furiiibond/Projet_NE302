@@ -188,7 +188,61 @@ int Boucle1(int x, int y, char **ptr, char *end, node** node_ptr){
 	return res;
 }
 
-
+int Michel_pourcent(char ** ptr){
+	int res=TRUE;
+	(*ptr)++;
+	//on verrifie qu'il y a bien un x (toujours le cas normalement)
+	assert(**ptr == 'x');
+	
+	// A ce moment ptr pointe sur le 'x', donc ptr+3 pointe sur
+	//le char juste après le code hexa (soit un '.', soit un '-', soit un ' ')
+	if (*((*ptr) + 3) == '.') {
+		/*Si il y a un point on est dans le cas:
+			%xHH.HH.HH...
+		*/
+		
+		uint8_t nb;
+		char *mem_bak = mem;// sauvegarde du pointeur memoire (pas utile ?)
+		//Tant qu'il rest des HH à scanner, que res est vrai, et que le pointeur mem est correct
+		while(!isspace(**ptr) && res && mem < no_go_zone) {
+			//on scan la valeur ascii
+			sscanf((*ptr) + 1, "%hhx", &nb);
+			//et si mem pointe un char qui valide le code nd
+			res = (*mem == nb);
+			// alors on incrémente mem
+			mem += res;
+			//on avance ptr de 3 pour aller lire le prochain (on saute ".HH")
+			(*ptr) += 3;
+		}
+		
+		if (!res) {//Si res est faux on restore mem (pas utile ?)
+			mem = mem_bak;
+		}
+	}
+	else {
+		/*Sinon on est dans le cas:
+			%xHH-HH     ou	   %xHH
+		*/
+		
+		uint8_t h1, h2;
+		//on remplit h1 et h2 
+		sscanf((*ptr) + 1,"%hhx-%hhx", &h1, &h2);
+		
+		//si il y a un tiret après HH
+		if (*((*ptr) + 3) == '-')
+			(*ptr) += 6;//On avance de 6 (on saute "xHH-HH")
+		else{
+			(*ptr) += 3;//Sinon on avance de 3 (on saute "xHH")
+			h2 = h1;// c'est pour le test juste après
+		}
+		
+		// on check si *mem est compris entre h1 et h2
+		res = ((*mem & MASK_OCTET) >= h1) && ((*mem & MASK_OCTET) <= h2);
+		mem += res;//on incrémente mem adéquatement (si res == 1)
+	}
+	
+	return res;
+}
 
 /** Si il y a bien une fonction à bien expliquer, c'est celle-là.
 	L'idée est d'avoir un pointeur qui parcour la chaine de charactère
@@ -267,57 +321,8 @@ char * sauvegarde_pointeur_memoire = mem;
 /*----*/if (*ptr == '%') { /* ETAPE 4 ----------------- */
 			//On pointe sur un %, il faut valider (ou pas)
 			//Le(s) code(s) ascii qui suivent le x
-			ptr ++;
-			//on verrifie qu'il y a bien un x (toujours le cas normalement)
-			assert(*ptr == 'x');
 			
-			// A ce moment ptr pointe sur le 'x', donc ptr+3 pointe sur
-			//le char juste après le code hexa (soit un '.', soit un '-', soit un ' ')
-			if (*(ptr + 3) == '.') {
-				/*Si il y a un point on est dans le cas:
-					%xHH.HH.HH...
-				*/
-				
-				uint8_t nb;
-				char *mem_bak = mem;// sauvegarde du pointeur memoire (pas utile ?)
-				//Tant qu'il rest des HH à scanner, que res est vrai, et que le pointeur mem est correct
-				while(!isspace(*ptr) && res && mem < no_go_zone) {
-					//on scan la valeur ascii
-					sscanf(ptr + 1, "%hhx", &nb);
-					//et si mem pointe un char qui valide le code nd
-					res = (*mem == nb);
-					// alors on incrémente mem
-					mem += res;
-					//on avance ptr de 3 pour aller lire le prochain (on saute ".HH")
-                    ptr += 3;
-				}
-				
-				if (!res) {//Si res est faux on restore mem (pas utile ?)
-                    mem = mem_bak;
-                }
-            }
-            else {
-				/*Sinon on est dans le cas:
-					%xHH-HH     ou	   %xHH
-				*/
-				
-				uint8_t h1, h2;
-				//on remplit h1 et h2 
-				sscanf(ptr + 1,"%hhx-%hhx", &h1, &h2);
-				
-				//si il y a un tiret après HH
-				if (*(ptr + 3) == '-')
-                    ptr += 6;//On avance de 6 (on saute "xHH-HH")
-				else{
-                    ptr += 3;//Sinon on avance de 3 (on saute "xHH")
-                    h2 = h1;// c'est pour le test juste après
-                }
-				
-				// on check si *mem est compris entre h1 et h2
-				res = ((*mem & MASK_OCTET) >= h1) && ((*mem & MASK_OCTET) <= h2);
-				mem += res;//on incrémente mem adéquatement (si res == 1)
-			}
-			
+			res = Michel_pourcent(&ptr);
 		}
 		else
 /*----*/if (*ptr == '"') { /* ETAPE 5 ----------------- */
