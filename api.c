@@ -67,9 +67,11 @@ int parseur(char *req, int len) {
     printf("Valid:");
     truth(r);
 
-	if (r)
-		display_tree(getRootTree(), 0);
-	else
+	if (!r)
 		purgeTree(getRootTree());
+	#if DISPLAY_TREE
+	else
+		display_tree(getRootTree(), 0);
+	#endif
     return r;
 }

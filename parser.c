@@ -9,6 +9,7 @@ char *no_go_zone;
 /* Cette fonction est appellé quand algo0() rencontre un charactère alphanumérique 
 	(ce qui correspond à un tag de la grammaire abnf)
 	Le but de cette fonction est donc d'appller la fonction construire sur ce tag.
+	NODE_PTR: en entrée node_ptr doit toujours pointer sur un élément vide.
 */
 int matchedCommand(char **ptr, char *end, node **node_ptr) {
 	// Initialisation de res la variable qui contiendra le résultat à retourner
@@ -67,6 +68,7 @@ int matchedCommand(char **ptr, char *end, node **node_ptr) {
 /* ------------- LOOP ------------- */
 /* Cette fonction permet de faciliter les répétitions d'appels à algo0()
 	Elle est principalement utilisée pour les chiffres / * / ( ) / [ ]
+	NODE_PTR: en entrée node_ptr doit toujours pointer sur un élément vide.
 */
 int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 	// Initialisation de res la variable qui contiendra le résultat à retourner
@@ -81,11 +83,6 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
 	int i = 0;
 	while (i < max && res) {
 				
-		// On backup le pointeur vers le noeud vide actuel.
-		// Si on ne valide pas un appel à algo0(), on restore ce pointeur et on supprime tout
-		// memory leak fix 1 (more to come) EDIT:CA N'A RIEN FIXE DU TOUT EN FAIT, INUTILE
-/*/!\*/	node* bakcup_first_child = *noeud;
-		
 		/** ############# ~~ APPEL ITERATIF ? ~~ ##################*/
 		/** ###*/ res = algo0(debut, fin - debut, *noeud);  /** ###*/ 
 		/** #######################################################*/
@@ -101,7 +98,6 @@ int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
         } 
 		else{
 			//Si le resultat est faux, on veux supprimer tous les frère/fils qui auraient été créé
-/* /!\/!\ */*noeud =  bakcup_first_child;//noeud ne peut pas être modifié par algo donc cette ligne est inutile
             //on transforme donc le noeud pointé par *noeud en élément vide et on supprime toute son arborescence
 			reset_first_child_queue(*noeud);
 		}
@@ -139,7 +135,8 @@ void reset_first_child_queue(node* noeud) {
 	//rend l'élément "vide"
     noeud->tag[0]='\0';
     noeud->len_value = 0;
-	/*Ce serait bien si on pouvait appeler purgeTree() sur NULL*/
+	/*Ce serait bien si on pouvait appeler purgeTree() sur NULL 
+			Youpi on peut maintenant*/
 	//Purge a partir du brother et child s'ils existent
     if (noeud->brother) {
         purgeTree(noeud->brother);
@@ -484,9 +481,12 @@ char * sauvegarde_pointeur_memoire = mem;
 /* A déplacer ou vous voulez (peut-etre tree.c)*/
 int deleteEmptyBrothers(node* noeud) {
     if (noeud == NULL)
-        return 1; // failsafe (si il n'y a pas de fr`re vide, ce qui ne devrait jamais arriver)
+        return 1; // failsafe (si il n'y a pas de frère vide, ce qui ne devrait jamais arriver)
     if (*(noeud->tag) == '\0') {
         free(noeud);
+		#if DEBUG_TREE_FREE
+			printf("free: [%p] of empty node in deleteEmptyBrothers()\n",noeud);
+		#endif
         return 1;
     }
     else {
@@ -500,7 +500,9 @@ int deleteEmptyBrothers(node* noeud) {
 int construire(char *module, node* parent) {
     int valid = 0;
     char *str = content(module);
-	
+	#if DEBUG_CONSTRUIRE_IN
+		printf("contruire(%s) Rule is :__%s__\n",module,str);
+	#endif
 
     char *debut_value = mem;
 
@@ -512,16 +514,11 @@ int construire(char *module, node* parent) {
     valid = algo0(str, strlen(str), first_child);
 
 
-/** IDEE: Refaire les dépendances [DONE]
-		Ex: Algo0-> TRUE = renvoie un arbre valide (avec un élem vide)  <-c'est fait
-					FALSE = renvoie un élément vide						<-idem
-		construire->TRUE = arbre valide descendant de parent  	<-c'est fait
-					FALSE = arbre vide parent->child = NULL		<-idem
-**/
 
     if (valid) {
+		//Si Le premier fils est vide (ou s'il n'y en a pas)
         if (deleteEmptyBrothers(first_child)) {
-            parent->child = NULL;
+            parent->child = NULL;//pas d'enfant donc NULL
         }
     } else {
         purgeTree(first_child);

@@ -6,8 +6,7 @@
 #define C_TAG CYN
 #define C_STR GRN
 
-//Profondeur maximale de la fonction display
-#define MAX_DEPTH 1
+
 
 node* treeRoot = NULL; // global
 
@@ -22,14 +21,14 @@ void *getRootTree() {
  *      Free all the structure node (http tree)
  */
 void purgeTree(void *root) {
-    struct node *tmp = root;
-    node *child = tmp->child;
-    while (child) {
-        node *next = child->brother;
-        purgeTree(child);
-        child = next;
-    }
-
+    struct node *tmp = root; //parce que flemme de cast
+    if(tmp==NULL)
+		return;
+	purgeTree(tmp->brother);
+	purgeTree(tmp->child);
+	#if DEBUG_TREE_FREE
+		printf("free: [%p] of node [%s] in purgeTree()\n",tmp,tmp->tag);
+	#endif
     free(tmp);
 }
 
@@ -38,6 +37,9 @@ void purgeTree(void *root) {
  */
 node *generateNode(char* tag, char* value, int len_value) {
     struct node *node = malloc(sizeof(struct node));
+	#if DEBUG_TREE_MALLOC
+		printf("malloc: [%p] in generateNode()\n",node);
+	#endif
     if (node == NULL) {
         perror("generateNode: malloc failed");
         exit(1);
@@ -121,7 +123,7 @@ void _searchTree(node *start, char *name, _Token **tok) {
     }
     node *cur = start;
 
-  
+
     if (cur->child)
         _searchTree(cur->child, name, tok);
     if (cur->brother)
