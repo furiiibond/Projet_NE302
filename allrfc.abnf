@@ -279,4 +279,4 @@ cookie-value = ( DQUOTE * cookie-octet DQUOTE ) / * cookie-octet
 cookie-octet = %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E  
 Cookie-header = "Cookie:" OWS cookie-string OWS  
 cookie-string = cookie-pair * ( ";" SP cookie-pair )  
-header-field = Connection-header / Content-Length-header / Content-Type-header / Cookie-header / Transfer-Encoding-header / Expect-header / Host-header / Accept-Language-header / Accept-Charset-header / Accept-header / Referer-header / User-Agent-header / ( field-name ":" OWS field-value OWS ) 
+header-field = Connection-header / Content-Length-header / Content-Type-header / Cookie-header / Transfer-Encoding-header / Expect-header / Host-header / ( field-name ":" OWS field-value OWS ) 

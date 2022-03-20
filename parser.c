@@ -244,6 +244,38 @@ int Michel_pourcent(char ** ptr){
 	return res;
 }
 
+int Cocktel_Molotov(char **ptr, char *end, node** node_ptr){
+	int res;
+
+	(*ptr)++;//valeur à l'addresse de ptr égale ptr plus 1 point virgule
+	
+	//on cherche la longueur de la chaine (jusqu'au prochain guillemet)
+	int longueur = distance_from(*ptr, end, '"');
+	
+	//si mem + taille de la chaine sort de la zone mémoire attribué à la requête à parser
+	if (mem + longueur >= no_go_zone)
+		res = FALSE;//ON EXIT (car on a pas le droit de lire plus loin que no_go_zone)
+	else
+	//sïnon on compare (case insensitive) la chaine avec la zone de taille longueur pointé par mem
+		res = nocase_memcomp(*ptr, mem, longueur);
+	
+	//si resultat est vrai
+	if (res) {
+		//dans la feuille de l'arbre correspondante, on copie le tag ("case_insensitnve striong")
+		strcpy((*node_ptr)->tag, "case_insensitive_string");
+		(*node_ptr)->value = mem;
+		(*node_ptr)->len_value = longueur;
+		mem += longueur;
+		//on crée un nouveau frère vide
+		*node_ptr = addNodeAsBrother("", mem, 0, *node_ptr);
+	}
+	//on incrémente ptr
+	(*ptr) += longueur + 1;
+	
+	return res;
+}
+
+
 /** Si il y a bien une fonction à bien expliquer, c'est celle-là.
 	L'idée est d'avoir un pointeur qui parcour la chaine de charactère
 	correspondant à la ligne de la grammaire abnf que nous somme en train d'analyser.
@@ -287,7 +319,7 @@ char * sauvegarde_pointeur_memoire = mem;
 			//On veut donc mettre a jour notre min et max nombre d'iteration (x et y)
 			//Puis déterminer le morceau de règles à looper (boucler ?)
 			//Avant d'appeller la fonction loopAlgoCalls()
-		if (isdigit(*ptr) ) {/* Etape 30a */
+		if (isdigit(*ptr)){/* - Etape 30a - */
 			int x, y;
 			y = MAX_ITER;
 			
@@ -302,7 +334,7 @@ char * sauvegarde_pointeur_memoire = mem;
 			//fonction cool
 			res = Boucle1(x,y,&ptr,end,&node_ptr);
 
-		} else if (*ptr=='*') {/* Etape 30b */
+		} else if (*ptr=='*'){/* Etape 30b  */
 			
 			int x, y;
 			y = MAX_ITER;
@@ -318,45 +350,7 @@ char * sauvegarde_pointeur_memoire = mem;
 		
 		}
 		else
-/*----*/if (*ptr == '%') { /* ETAPE 4 ----------------- */
-			//On pointe sur un %, il faut valider (ou pas)
-			//Le(s) code(s) ascii qui suivent le x
-			
-			res = Michel_pourcent(&ptr);
-		}
-		else
-/*----*/if (*ptr == '"') { /* ETAPE 5 ----------------- */
-			// On match des guillemets, on veut donc comparer une chaine de charactères
-			
-			
-			ptr++;//valeur à l'addresse de ptr égale ptr plus 1 point virgule
-			
-			//on cherche la longueur de la chaine (jusqu'au prochain guillemet)
-			int longueur = distance_from(ptr, end, '"');
-			
-			//si mem + taille de la chaine sort de la zone mémoire attribué à la requête à parser
-			if (mem + longueur >= no_go_zone)
-				res = FALSE;//ON EXIT EN URGENCE
-			else
-			//sïnon on compare (case insensitive) la chaine avec la zone de taille longueur pointé par mem
-				res = nocase_memcomp(ptr, mem, longueur);
-			
-			//si resultat est vrai
-            if (res) {
-				//dans la feuille de l'arbre correspondante, on copie le tag ("case_insensitnve striong")
-                strcpy(node_ptr->tag, "case_insensitive_string");
-                node_ptr->value = mem;
-                node_ptr->len_value = longueur;
-                mem += longueur;
-				//on crée un nouveau frère vide
-                node_ptr = addNodeAsBrother("", mem, 0, node_ptr);
-            }
-			//on incrémente ptr
-			ptr += longueur + 1;
-
-		}
-		else
-/*----*/if (*ptr == '(') {/*  ETAPE 9 ----------------- */
+		if (*ptr == '(') {/* -- ETAPE 9 --- */
 			//c'est une parenthese, on veut valider une et unique fois
 			// son contenu
 			ptr++;
@@ -368,7 +362,7 @@ char * sauvegarde_pointeur_memoire = mem;
             ptr++;
 		}
 		else
-/*----*/if (*ptr == '[') {/* ETAPE 10 ---------------- */
+		if (*ptr == '[') {/* -- ETAPE 10 -- */
 			//c'est des crochets
 			//on veut valider ce qu'il y a entre crochet 0 ou 1 fois
 			char *debut = ++ptr;
@@ -377,6 +371,21 @@ char * sauvegarde_pointeur_memoire = mem;
             res = loopAlgoCalls(0, 1, debut, ptr, &node_ptr);
 			//res = TRUE
 			ptr++;
+		}
+		else
+/*--------------DONE WITH LOOP -------------------------*/
+/*----*/if (*ptr == '%') { /* ETAPE 4 ----------------- */
+			//On pointe sur un %, il faut valider (ou pas)
+			//Le(s) code(s) ascii qui suivent le x
+			
+			res = Michel_pourcent(&ptr);
+		}
+		else
+/*----*/if (*ptr == '"') { /* ETAPE 5 ----------------- */
+			// On match des guillemets, on veut donc comparer une chaine de charactères
+			
+			res = Cocktel_Molotov(&ptr, end, &node_ptr);
+
 		}
 		else if (*ptr == ')') {
             //ERREUR
@@ -460,6 +469,7 @@ char * sauvegarde_pointeur_memoire = mem;
 /*Acol*/}/*ade inutile /!\ */
 		
 		ptr++;
+	
 	}//FIN DU WHILE()
 	
 	if (mem > no_go_zone) {
