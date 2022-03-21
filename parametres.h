@@ -3,7 +3,7 @@
 /* Fichier dans lequel on définiera tous les paramètres pour moins de confusion */
 
 //ABNF Gramm file
-#define ABNF_RULES "allrfc.abnf" //Fichier contenant les règles de grammaire
+#define ABNF_RULES "fullrfc.abnf" //Fichier contenant les règles de grammaire
 #define FIRST_TAG "HTTP-message" //Premier Tag pour l'appel récursif
 
 //Maximum rule line size
@@ -29,15 +29,15 @@
 /* #### */	#define DEBUG_MATCHED_STRING 0// Debug la fonction Cocktel_Molotov
 /* #### */	#define DEBUG_ETAPE2 0// Debug la fin de la boucle (etape2)
 /* #### ----DEBUG call and return of main functions ---*/
-/* #### */	#define DEBUG_CONSTRUIRE_IN 1//Display the string passed to construire, along with its matched abnf rule
+/* #### */	#define DEBUG_CONSTRUIRE_IN 0//Display the string passed to construire, along with its matched abnf rule
 /* #### */	#define DEBUG_CONSTRUIRE_OUT 0// Display res when construire return
 /* #### */	#define DEBUG_ALGO_IN 0//Display the string passed to algo0
 /* #### */	#define DEBUG_ALGO_OUT 0// Display res when algo0 return, along with the string with which algo0 was called
 /* #### ----DEBUG call and return of main functions ---*/
 /* #### */	#define DEBUG_TREE_GROWTH 0//Display Tree at every step in the process ("step" yet to be define)
 /* #### */	//(step>)can be split in DEBUG_TREE_CONSTRUIRE / DEBUG_TREE_ALGO / DEBUG_TREE_LOOP
-/* #### */	#define DEBUG_TREE_MALLOC 1//Every time there's a malloc for a tree part, there's a printf
-/* #### */	#define DEBUG_TREE_FREE 1//  Every time there's a free	for a tree part, there's a printf
+/* #### */	#define DEBUG_TREE_MALLOC 0//Every time there's a malloc for a tree part, there's a printf
+/* #### */	#define DEBUG_TREE_FREE 0//  Every time there's a free	for a tree part, there's a printf
 /* ######################################### */
 
 #endif

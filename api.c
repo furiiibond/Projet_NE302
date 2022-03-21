@@ -60,6 +60,9 @@ int parseur(char *req, int len) {
     mem = req;
     no_go_zone = mem + len;
 	createRoot(FIRST_TAG, req, len);
+	
+	init_gramm_rule();
+	
     int r = construire(FIRST_TAG, getRootTree());
 
 	FIX_FINAL_NE_PAS_TOUCHER();

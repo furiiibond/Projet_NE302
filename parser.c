@@ -11,12 +11,12 @@ char *no_go_zone;
 	Le but de cette fonction est donc d'appller la fonction construire sur ce tag.
 	NODE_PTR: en entrée node_ptr doit toujours pointer sur un élément vide.
 */
-int matchedCommand(char **ptr, char *end, node **node_ptr) {
+int matchedCommand(const char **ptr, const char *end, node **node_ptr) {
 	// Initialisation de res la variable qui contiendra le résultat à retourner
 	int res = TRUE;//pas nécessaire d'initialiser à TRUE
 	
 	//debut est un pointeur vers la première lettre du tag (le début du mot, d'où le nom)
-	char * debut = (*ptr);
+	const char * debut = (*ptr);
 	//pour avoir la fin du mot il suffit d'avancer le pointeur *ptr jusqu'au prochain espace
 	//(dans la grammaire tous les éléments sont séparés par des espace)
 	while (*ptr < end && !isspace(*++(*ptr))) ;
@@ -70,7 +70,7 @@ int matchedCommand(char **ptr, char *end, node **node_ptr) {
 	Elle est principalement utilisée pour les chiffres / * / ( ) / [ ]
 	NODE_PTR: en entrée node_ptr doit toujours pointer sur un élément vide.
 */
-int loopAlgoCalls(int min, int max, char *debut, char *fin, node **noeud) {
+int loopAlgoCalls(int min, int max,const  char *debut,const  char *fin, node **noeud) {
 	// Initialisation de res la variable qui contiendra le résultat à retourner
 	int res = TRUE;
 	
@@ -149,7 +149,7 @@ void reset_first_child_queue(node* noeud) {
 		
 }
 
-int Boucle1(int x, int y, char **ptr, char *end, node** node_ptr){
+int Boucle1(int x, int y, const char **ptr, const char *end, node** node_ptr){
 	
 	//on déplace le pointeur après les chiffres/étoile
 	while (!isspace(*++*ptr)){;}
@@ -158,7 +158,7 @@ int Boucle1(int x, int y, char **ptr, char *end, node** node_ptr){
 	while (isspace(*++*ptr)){;}
 	
 	//On sauvegarde le début de la chaine 
-	char* debut_chaine = *ptr;
+	const char* debut_chaine = *ptr;
 
 	if (**ptr == '(') {
 		//Etape n°33
@@ -185,7 +185,7 @@ int Boucle1(int x, int y, char **ptr, char *end, node** node_ptr){
 	return res;
 }
 
-int Michel_pourcent(char ** ptr){
+int Michel_pourcent(const char ** ptr){
 	int res=TRUE;
 	(*ptr)++;
 	//on verrifie qu'il y a bien un x (toujours le cas normalement)
@@ -241,7 +241,7 @@ int Michel_pourcent(char ** ptr){
 	return res;
 }
 
-int Cocktel_Molotov(char **ptr, char *end, node** node_ptr){
+int Cocktel_Molotov(const char **ptr, const char *end, node** node_ptr){
 	int res;
 
 	(*ptr)++;//valeur à l'addresse de ptr égale ptr plus 1 point virgule
@@ -278,8 +278,8 @@ int Cocktel_Molotov(char **ptr, char *end, node** node_ptr){
 	correspondant à la ligne de la grammaire abnf que nous somme en train d'analyser.
 	On prend ensuite des décisions en fonction des charactères lu au fur et à mesure.
 **/
-int algo0(char *str, int len, node * first_Child) { // if error return 1 else 0
-	char *ptr, *end;
+int algo0(const char *str, int len, node * first_Child) { // if error return 1 else 0
+	const char *ptr, *end;
     node * node_ptr = first_Child;
 	int res = TRUE;
 	ptr = str;
@@ -351,7 +351,7 @@ char * sauvegarde_pointeur_memoire = mem;
 			//c'est une parenthese, on veut valider une et unique fois
 			// son contenu
 			ptr++;
-			char *debut = ptr;
+			const char *debut = ptr;
 			goto_next(&ptr, end, ')');
 
 			res = loopAlgoCalls(1, 1, debut, ptr, &node_ptr);
@@ -362,7 +362,7 @@ char * sauvegarde_pointeur_memoire = mem;
 		if (*ptr == '[') {/* -- ETAPE 10 -- */
 			//c'est des crochets
 			//on veut valider ce qu'il y a entre crochet 0 ou 1 fois
-			char *debut = ++ptr;
+			const char *debut = ++ptr;
 			goto_next(&ptr, end, ']');
 			//on loop entre 0 et 1 fois
             res = loopAlgoCalls(0, 1, debut, ptr, &node_ptr);
@@ -499,9 +499,12 @@ int deleteEmptyBrothers(node* noeud) {
 
 int construire(char *module, node* parent) {
     int valid = 0;
-    char *str = content(module);
+    String_View sv;
+	sv.data=module; sv.count = strlen(module);
+	sv = getRule(sv);
+	cacheAddUser(sv);
 	#if DEBUG_CONSTRUIRE_IN
-		printf("contruire(%s) Rule is :__%s__\n",module,str);
+		printf("contruire(%s) Rule is :__"SV_Fmt"__\n",module,SV_Arg(sv));
 	#endif
 
     char *debut_value = mem;
@@ -511,7 +514,7 @@ int construire(char *module, node* parent) {
     node *first_child = addNodeAsChild("", debut_value, 0, parent);
 
     /* Procedure d'appel principale */
-    valid = algo0(str, strlen(str), first_child);
+    valid = algo0(sv.data, sv.count, first_child);
 
 
 
@@ -523,11 +526,11 @@ int construire(char *module, node* parent) {
     } else {
         purgeTree(first_child);
         parent->child = NULL;
+		//restore mem
+		mem = debut_value;
     }
-
-
-
-	free(str);
+	
+	cacheDelUser(sv);
 
 	return valid; // return 1 si valide
 }

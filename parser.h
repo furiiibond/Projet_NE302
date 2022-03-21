@@ -39,7 +39,7 @@ int construire(char *module, node *parent);
 
 
 //things that shouldn't be there :(
-int algo0(char *str, int len, node *first_Child);
+int algo0(const char *str, int len, node *first_Child);
 
 void reset_first_child_queue(node* noeud);
 
