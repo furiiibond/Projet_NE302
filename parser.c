@@ -258,8 +258,8 @@ int Cocktel_Molotov(const char **ptr, const char *end, node** node_ptr){
 	
 	//si resultat est vrai
 	if (res) {
-		//dans la feuille de l'arbre correspondante, on copie le tag ("case_insensitnve striong")
-		strcpy((*node_ptr)->tag, "case_insensitive_string");
+		//dans la feuille de l'arbre correspondante, on copie le tag ("case-insensitive-string")
+		strcpy((*node_ptr)->tag, "case-insensitive-string");
 		(*node_ptr)->value = mem;
 		(*node_ptr)->len_value = longueur;
 		mem += longueur;
