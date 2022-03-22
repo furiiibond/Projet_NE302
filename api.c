@@ -15,6 +15,14 @@ _Token *searchTree(void *start, char *name) {
         if (tmp == NULL)
             tmp = getRootTree();
         _Token *r = NULL;
+
+        int i=0;
+        while(name[i] != '\0'){
+          if (name[i]=='_') //Fixing the fix
+            name[i]='-';
+          i++;
+        }
+
         _searchTree(tmp, name, &r);
         return r;
 }
