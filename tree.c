@@ -7,7 +7,6 @@
 #define C_STR GRN
 
 
-
 node* treeRoot = NULL; // global
 
 /*
@@ -21,14 +20,15 @@ void *getRootTree() {
  *      Free all the structure node (http tree)
  */
 void purgeTree(void *root) {
-    struct node *tmp = root; //parce que flemme de cast
-    if(tmp==NULL)
+    struct node *tmp = root;
+    if (tmp == NULL)
 		return;
-	purgeTree(tmp->brother);
-	purgeTree(tmp->child);
-	#if DEBUG_TREE_FREE
-		printf("free: [%p] of node [%s] in purgeTree()\n",tmp,tmp->tag);
-	#endif
+  	purgeTree(tmp->brother);
+  	purgeTree(tmp->child);
+  #if DEBUG_TREE_FREE
+  	printf("free: [%p] of node [%s] in purgeTree()\n", tmp, tmp->tag);
+  #endif
+
     free(tmp);
 }
 
@@ -38,13 +38,13 @@ void purgeTree(void *root) {
 node *generateNode(char* tag, char* value, int len_value) {
     struct node *node = malloc(sizeof(struct node));
 	#if DEBUG_TREE_MALLOC
-		printf("malloc: [%p] in generateNode()\n",node);
+		printf("malloc: [%p] in generateNode()\n", node);
 	#endif
     if (node == NULL) {
         perror("generateNode: malloc failed");
         exit(1);
     }
-    strcpy(node->tag,tag);
+    strcpy(node->tag, tag);
     node->value = value;
     node->len_value = len_value;
     node->child = NULL;
@@ -67,7 +67,7 @@ _Token *generateToken(node* noeud) {
 }
 
 /*
- *      Initalize the global root of the http tree
+ *      Initalizes the global root of the http tree
  */
 void createRoot(char* tag, char* value, int len_value) {
     treeRoot = generateNode(tag, value, len_value);
@@ -77,7 +77,7 @@ void createRoot(char* tag, char* value, int len_value) {
  *      Generate a new node and adds it to the current node as a brother
  */
 node *addNodeAsBrother(char* tag, char* value, int len_value, node* current) {
-    if (current != NULL) { // check if the current node as been malloc
+    if (current != NULL) { // check if the current node has been malloc
         node *node = generateNode(tag, value, len_value);
         current->brother = node;
     }
@@ -123,18 +123,16 @@ void _searchTree(node *start, char *name, _Token **tok) {
     }
     node *cur = start;
 
-
     if (cur->child)
         _searchTree(cur->child, name, tok);
     if (cur->brother)
         _searchTree(cur->brother, name, tok);
-
 }
 
 /*
  *      Displays the whole tree in the standard output
  */
-void display_tree(node* noeud, int n) {	//1er appel : noeud=treeRoot, n=0
+void display_tree(node* noeud, int n) {	//first call: noeud=treeRoot, n=0
     for (int i = 0; i < n; i++)
         printf("  ");
 
@@ -155,7 +153,7 @@ void display_tree(node* noeud, int n) {	//1er appel : noeud=treeRoot, n=0
         printf("..");
     printf(NC"\"\n");
 
-    if (noeud->child && n<MAX_DEPTH) {
+    if (noeud->child && n < MAX_DEPTH) {
         display_tree(noeud->child, n+1);
     }
     if (noeud->brother) {

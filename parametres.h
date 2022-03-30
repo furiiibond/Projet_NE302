@@ -18,7 +18,7 @@
 #define MAX_DEPTH 2
 
 // If defined, will display the tree produced
-#define DISPLAY_TREE 0
+#define DISPLAY_TREE 1
 
 /* ############## DEBUG FLAGS ############## */
 /* #### */	#define DEBUG 0// define every DEBUG Flag
