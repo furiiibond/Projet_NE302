@@ -1,0 +1,49 @@
+\section{message Struct Reference}
+\label{structmessage}\index{message@{message}}
+
+
+Objet message qui peut etre soit une requete, soit une reponse. utilisé pour communiquer entre le programme et la bibliothèque.  
+
+
+
+
+{\ttfamily \#include $<$request.\+h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ {\bf buf}
+\item 
+unsigned int {\bf len}
+\item 
+unsigned int {\bf client\+Id}
+\item 
+struct sockaddr\+\_\+in $\ast$ {\bf client\+Address}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Objet message qui peut etre soit une requete, soit une reponse. utilisé pour communiquer entre le programme et la bibliothèque. 
+
+Pour les requetes l'allocation du pointeur buf est fait par la librairie, le programme recoit l'information par la fonction get\+Request, et une fois le message traité par le programme, il doit libérer explicitement le message par la fonction free\+Request.
+
+Pour les reponses, la librairie recopie les données pointées dans une structure de message interne, le programme peut donc liberer la memoire si necessaire tout de suite après l'appel à send\+Reponse. 
+
+\subsection{Field Documentation}
+\index{message@{message}!buf@{buf}}
+\index{buf@{buf}!message@{message}}
+\subsubsection[{buf}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ message\+::buf}\label{structmessage_ae39c7ead60245755a62c4aefcb0ea53e}
+buf Un pointeur vers le message recu \index{message@{message}!client\+Address@{client\+Address}}
+\index{client\+Address@{client\+Address}!message@{message}}
+\subsubsection[{client\+Address}]{\setlength{\rightskip}{0pt plus 5cm}struct sockaddr\+\_\+in$\ast$ message\+::client\+Address}\label{structmessage_a3c3a02f02d5ba650223498f95f30cb4c}
+iclient\+Address pointeur vers une structure permettant de recuperer l'adresse I\+P et le port du client H\+T\+T\+P \index{message@{message}!client\+Id@{client\+Id}}
+\index{client\+Id@{client\+Id}!message@{message}}
+\subsubsection[{client\+Id}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int message\+::client\+Id}\label{structmessage_a14bfec4a2137426f4b33df4c470310da}
+client\+Id identifiant du client, recu dans une requete, doit etre recopier dans la reponse correspondante \index{message@{message}!len@{len}}
+\index{len@{len}!message@{message}}
+\subsubsection[{len}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int message\+::len}\label{structmessage_a24bc7afeef646e268eefce5086872da8}
+len La longueur du message recu 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+api/{\bf request.\+h}\end{DoxyCompactItemize}
