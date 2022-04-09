@@ -1,3 +1,0 @@
-message = 1* ( mot / 2* "c" ) 
-mot = 1*4 baba 
-baba = "baba" 
