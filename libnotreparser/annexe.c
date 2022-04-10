@@ -42,7 +42,7 @@ unsigned long hash(String_View sv)
 void load_gramm_rule(char *gram_file){
 	
 	if ((ABNF_FileDescriptor = open(gram_file, O_RDWR)) == -1) {
-		perror("open");
+		perror("Can't open gram_file");
 		exit(1);
 	}
 	struct stat st;
