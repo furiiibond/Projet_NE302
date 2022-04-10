@@ -1,8 +1,9 @@
 
 
 /* Les règles de grammaires par défault*/
-#define ABNF_RULES "fullrfc.abnf"
+#define HTTP_RULES "fullrfc.abnf"
 
+#define CONF_RULES "config.abnf"
 
 
 
@@ -16,7 +17,7 @@
 	-Les paramètres du site sont définis globalement dans /$(A_DEFINIR)/Server.conf
 		If options are missing there's no default, should raise an error
 */
-
+#define SERV_CONFIG "Hosts.conf"
 
 
 
@@ -32,9 +33,23 @@ struct Options {
 	
 	struct Options* next;
 }
+extern struct Options* HostsParametres;
 /*
 	L'intéret sera de pouvoir parser le fichier de config serveur, puis créer une liste
 	chainée où chaque maillon contiendra les informations d'un site en particulier.
 	Ces infos seront utiles pour traiter les requetes (ex:GET)
 	que ce soit en version 1.0 (DocumentRoot), ou 1.1 (ServerName).
 */
+
+
+
+
+//#####~Docs~#######
+//
+// apache2: 		https://www.liquidweb.com/kb/configure-apache-virtual-hosts-ubuntu-18-04/
+// .htaccess: 		https://httpd.apache.org/docs/2.4/howto/htaccess.html
+// default page:	https://stackoverflow.com/questions/19322345/how-do-i-change-the-default-index-page-in-apache
+//
+//
+//
+//
