@@ -14,16 +14,16 @@
 #include "httpparser.h"
 #include "api.h"
 
-#define ERROR "HTTP/1.0 400 SUCKA\r\n\r\n"
-#define REPONSE "HTTP/1.0 200 OK\r\nContent-type: text/plain\r\n\r\nHey Bro why did you send me this:\r\n"
 
-#define ABNF_RULES "fullrfc.abnf"
+//
+#include "parametres.h"
+
 
 int main(int argc, char *argv[])
 {
 	message *requete;
 	int res;
-	load_gramm_rule(ABNF_RULES);
+	load_gramm_rule(HTTP_RULES,FIRST_TAG);
 	while ( 1 ) {
 		// on attend la reception d'une requete HTTP requete pointera vers une ressource allouée par librequest.
 		if ((requete=getRequest(8080)) == NULL ) return -1;

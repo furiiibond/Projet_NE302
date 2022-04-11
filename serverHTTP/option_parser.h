@@ -15,5 +15,5 @@
 */
 int FillHostsParametres(void);
 
-// Autre déclaration si on ne veut pas que HostInfos
+// Autre déclaration si on ne veut pas que HostsParametres soit global
 // int FillHostsParametres(extern struct Options* HostsParametres);

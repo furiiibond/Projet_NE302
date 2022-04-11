@@ -1,0 +1,35 @@
+ALPHA = %x41-5A / %x61-7A  
+DIGIT = %x30-39  
+HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"  
+DQUOTE = %x22  
+SP = %x20  
+HTAB = %x09  
+OWS = * ( SP / HTAB ) 
+VCHAR = %x21-7E  
+CHAR = %x01-7F  
+CR = %x0D  
+LF = %x0A 
+CRLF = CR LF 
+
+tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA 
+
+nicechar = "!" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA 
+
+Config = * Comment 1* ( Entry  * Comment )
+
+Comment = "#" *VCHAR CRLF
+
+Entry =  Hostname "{" OWS [CRLF] Params "}"
+
+Params = DocRoot * nondef
+
+DocRoot = OWS "Root-dir" OWS "=" OWS DQUOTE path DQUOTE OWS ( Comment / CRLF )
+
+path = * ( "/" * ALPHA ) [ "/" ]
+
+
+nondef = OWS param-name OWS "=" OWS value OWS ( Comment / CRLF )
+
+param-name = 1* nicechar 
+
+value = 1* nicechar 

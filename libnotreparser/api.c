@@ -68,15 +68,17 @@ void purgeElement(_Token **r) {
 int parseur(char *req, int len) {
     mem = req;
     no_go_zone = mem + len;
-	createRoot(FIRST_TAG, req, len);
+	createRoot(first_tag, req, len);
 
 
-    int r = construire(FIRST_TAG, getRootTree());
+    int r = construire(first_tag, getRootTree());
 
 	FIX_FINAL_NE_PAS_TOUCHER();
 
+	#if PRINT_VALID
     printf("Valid:");
     truth(r);
+	#endif
 
 	if (!r)
 		purgeTree(getRootTree());

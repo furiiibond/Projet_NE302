@@ -24,6 +24,9 @@ int parseur(char *req, int len);
 
 /* Fonction en plus */
 // Ouverture du fichier grammaire
-void load_gramm_rule(char *gram_file);
+void load_gramm_rule(char *gram_file, char *rule_init);
 // Fermeture du fichier grammaire
 void close_gramm_rule(void);
+//Variable globale pour le premier Tag
+#include "parametres.h" //param.h nescessaire pour TAG_LEN
+extern char first_tag[TAG_LEN];

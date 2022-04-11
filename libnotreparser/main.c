@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
         p = argv[2];
     }
     // call parser and get results.
-	load_gramm_rule(ABNF_RULES);
+	load_gramm_rule(ABNF_RULES,FIRST_TAG);
     if ((res = parseur(addr, st.st_size))) {
         _Token *r, *tok;
         void *root = NULL;

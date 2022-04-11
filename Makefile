@@ -18,6 +18,9 @@ main:
 	cp server .. && \
 	make clean
 
+sharedobject:
+	cd $(LIBPARS) && make sharedobject
+
 clean:
 	rm -f server
 	cd $(SERVER) && make clean

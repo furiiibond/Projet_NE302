@@ -17,8 +17,11 @@
 //Profondeur maximale de la fonction display_tree()
 #define MAX_DEPTH 2
 
-// If defined, will display the tree produced
+// If set to 1, will display the tree produced
 #define DISPLAY_TREE 0
+
+//
+#define PRINT_VALID 0
 
 /* ############## DEBUG FLAGS ############## */
 /* #### */	#define DEBUG 0// define every DEBUG Flag

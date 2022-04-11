@@ -1,7 +1,16 @@
 
 
+//Prof
+#define ERROR "HTTP/1.0 400 SUCKA\r\n\r\n"
+#define REPONSE "HTTP/1.0 200 OK\r\nContent-type: text/plain\r\n\r\nHey Bro why did you send me this:\r\n"
+
+
+
+
+
 /* Les règles de grammaires par défault*/
 #define HTTP_RULES "fullrfc.abnf"
+#define FIRST_TAG "HTTP-message"
 
 #define CONF_RULES "config.abnf"
 
@@ -14,10 +23,11 @@
  \Répartiton des paramètres:
 	-La page par défault est définie on a per directory basis in the .htaccess file
 		otherwise it's index.html
-	-Les paramètres du site sont définis globalement dans /$(A_DEFINIR)/Server.conf
+	-Les paramètres du site sont définis globalement dans $(SERV_CONFIG_PATH)/$(SERV_CONFIG)
 		If options are missing there's no default, should raise an error
 */
-#define SERV_CONFIG "Hosts.conf"
+//#define SERV_CONFIG_PATH "."
+#define SERV_CONFIG "server.conf"
 
 
 
@@ -32,7 +42,7 @@ struct Options {
 	
 	
 	struct Options* next;
-}
+};
 extern struct Options* HostsParametres;
 /*
 	L'intéret sera de pouvoir parser le fichier de config serveur, puis créer une liste

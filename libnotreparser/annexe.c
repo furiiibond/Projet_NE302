@@ -14,6 +14,7 @@
 
 int ABNF_FileDescriptor;
 String_View Abnf_FileMap; //should be const
+char first_tag[TAG_LEN];
 
 typedef struct {
 	unsigned long key;
@@ -39,7 +40,12 @@ unsigned long hash(String_View sv)
     return hash;
 }
 
-void load_gramm_rule(char *gram_file){
+void load_gramm_rule(char *gram_file, char *rule_init){
+	if(strlen(rule_init)>TAG_LEN){
+		perror("First tag too long");
+		exit(1);
+	}
+	strcpy(first_tag,rule_init);
 	
 	if ((ABNF_FileDescriptor = open(gram_file, O_RDWR)) == -1) {
 		perror("Can't open gram_file");
