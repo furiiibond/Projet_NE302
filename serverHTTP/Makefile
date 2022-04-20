@@ -8,6 +8,15 @@ LIBPARS = ../libnotreparser
 LIBREQ = ../librequest-0.5
 SERVER = .
 
+SRC=$(wildcard *.c)
+OBJS=$(SRC:.c=.o)
+
+OBJ_PATH=objs/
+#objs/
+
+CC=gcc
+FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api
+
 EXEC = server
 
 all: export notre
@@ -16,13 +25,34 @@ export:
 	@echo "Copier coller la ligne ci-dessous"
 	export LD_LIBRARY_PATH=LD_LIBRARY_PATH:$(LIBPARS):$(LIBREQ)
 
+# Creating directories
+dir:
+	@mkdir -p $(OBJ_PATH)
+
 prof:
 	gcc -I ../libparser -I ../librequest-0.5/api  -L ../libparser -L ../librequest-0.5 -o server server.c -lparser -lrequest
 
-notre:
-	gcc -I $(LIBPARS) -I $(LIBREQ)/api  -L $(LIBPARS) -L $(LIBREQ) -o $(EXEC) $(SERVER)/server.c -lnotreparser -lrequest 
+notre: debug dir $(OBJS) link
 
+link:
+	$(CC) $(FLAGS) -o $(EXEC) $(OBJ_PATH)*.o -L $(LIBPARS) -L $(LIBREQ) -lnotreparser -lrequest 
+
+#server.o: server.c
+#	gcc -I $(LIBPARS) -I $(LIBREQ)/api -o server.o -c $(SERVER)/server.c
+
+debug:
+	@echo TEST DEBUG OBJ FILES
+	@echo "$(SRC) | $(OBJS)"
+	@echo OK
+
+# All objects rule
+%.o: %.c
+	$(CC) $(FLAGS) -c $^ -o $(OBJ_PATH)$@
+
+# Cleaning the files
 clean:
-	rm -f server
+	@echo cleaning objects and exec
+	rm -rf $(OBJ_PATH)*.o $(EXEC)
+	rmdir --ignore-fail-on-non-empty $(OBJ_PATH)
 
 .PHONY: export all notre clean

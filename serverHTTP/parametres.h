@@ -1,4 +1,5 @@
-
+#ifndef PARAMETRES00
+#define PARAMETRES00
 
 //Prof
 #define ERROR "HTTP/1.0 400 SUCKA\r\n\r\n"
@@ -15,7 +16,15 @@
 #define CONF_RULES "config.abnf"
 
 
+typedef struct {
+	char path[256];
+	char type[20];
+} Fichier;
 
+typedef struct {
+	char* content;
+	int len;
+} HTML_Rep;
 
 
 
@@ -63,3 +72,5 @@ extern struct Options* HostsParametres;
 //
 //
 //
+
+#endif
