@@ -1,3 +1,5 @@
+#ifndef APIH
+#define APIH
 // defini un type pour la liste chainee renvoyée en réponse de la requete de recherche dans l'arbre.
 typedef struct _token {
     void *node; // node type opaque pointant vers un noeud de votre arbre.
@@ -30,3 +32,4 @@ void close_gramm_rule(void);
 //Variable globale pour le premier Tag
 #include "parametres.h" //param.h nescessaire pour TAG_LEN
 extern char first_tag[TAG_LEN];
+#endif

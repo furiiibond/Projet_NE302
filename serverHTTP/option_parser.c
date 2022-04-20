@@ -11,7 +11,7 @@ int FillHostsParametres(void){
 	
 	HostsParametres = malloc(sizeof(struct Options));
 	strcpy(HostsParametres->ServerName, "Sitecool.com");
-	strcpy(HostsParametres->DocumentRoot, "/var/www");
+	strcpy(HostsParametres->DocumentRoot, "/mnt/c/Users/J/OneDrive/3A/Cours_S2/Projet_NE302/Projet_NE302/www");
 	
 	HostsParametres->next = malloc(sizeof(struct Options));
 	strcpy(HostsParametres->ServerName, "NumeroDos.tv");

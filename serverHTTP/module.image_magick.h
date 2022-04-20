@@ -2,10 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+
+#include "parametres.h"
 
 #define DEFAULT_TYPE "text/plain"
 
-void get_file_type(const char* path, char* type){
+void get_file_type(Fichier f){
 	const char* tmp;
 	magic_t mag;
 	/*Create magic cookie pointer*/
@@ -22,8 +25,9 @@ void get_file_type(const char* path, char* type){
         return;
     }
 	/*Get MIME type*/
-	tmp = magic_file(mag, path);	//tmp is needed because magic_file returns a const char*
-	strcpy(type,tmp);
-	/*Close magic database and deallocates ressources used*/
+	tmp = magic_file(mag, f.path);	//tmp is needed because magic_file returns a const char*
+	assert(strlen(tmp)<=TYPE_LEN_MAX );
+	strcpy(f.type,tmp);
+	/*Close magic database and deallocates ressources used ("free" tmp)*/
 	magic_close(mag);
 }

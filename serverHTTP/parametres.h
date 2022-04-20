@@ -1,5 +1,7 @@
-#ifndef PARAMETRES00
-#define PARAMETRES00
+#ifndef PARAMETRESH
+#define PARAMETRESH
+
+#include "color.h"
 
 //Prof
 #define ERROR "HTTP/1.0 400 SUCKA\r\n\r\n"
@@ -10,19 +12,19 @@
 
 
 /* Les règles de grammaires par défault*/
-#define HTTP_RULES "fullrfc.abnf"
-#define FIRST_TAG "HTTP-message"
-
-#define CONF_RULES "config.abnf"
+#define HTTP_RULES "fullrfc.abnf","HTTP-message"
 
 
+#define PATH_LEN_MAX 256
+#define TYPE_LEN_MAX 20
 typedef struct {
-	char path[256];
-	char type[20];
+	char path[PATH_LEN_MAX];
+	char type[TYPE_LEN_MAX];
 } Fichier;
 
+#define HEADER_LEN_MAX 1000
 typedef struct {
-	char* content;
+	char content[HEADER_LEN_MAX];
 	int len;
 } HTML_Rep;
 
@@ -37,7 +39,7 @@ typedef struct {
 */
 //#define SERV_CONFIG_PATH "."
 #define SERV_CONFIG "server.conf"
-
+#define CONF_RULES "config.abnf","Config"
 
 
 
@@ -47,7 +49,7 @@ typedef struct {
 //exemple tiré de 000-default.conf (apache2)
 struct Options {
 	char ServerName[50];
-	char DocumentRoot[256];
+	char DocumentRoot[PATH_LEN_MAX];
 	
 	
 	struct Options* next;

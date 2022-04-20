@@ -1,31 +1,50 @@
+#include <stdio.h>	// printf
+#include <stdlib.h>	// malloc
+#include <string.h>	// strlen
+
 #include "request_handler.h"
 
-int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file){
-	
-	if ((res=parseur(requete->buf,requete->len))) {
-			_Token *r,*tok,*root;
+//parser api
+#include "api.h"
 
-			// get the root of the tree this is no longer opaque since we know the internal type with httpparser.h
-			//void *root;
-			writeDirectClient(requete->clientId,REPONSE,strlen(REPONSE));
+
+
+int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file){
+	int res;
+	if ((res=parseur(requete->buf,requete->len))) {
+			_Token *r,*r2,*tok,*root;
+
+			printf(GRN "Requete parsée\n" NC);
+			
+			strcpy(reponse->content, REPONSE);
+			reponse->len = strlen(REPONSE);
+			
 			root=getRootTree();
-			r=searchTree(root,"HTTP-message");
-			tok=r;
-			while (tok) {
-				int l;
-				char *s;
-				// node is no longer opaque
-				/* Lnode *node;
-				node=(Lnode *)tok->node; */
-				/** Utilisation de getElementValue() pour traiter le type opaque */
-				s = getElementValue(tok->node, &l);
-				writeDirectClient(requete->clientId,s,l);
-				tok=tok->next;
+			
+			// ECHO
+			r  = searchTree(root, "request-line");
+			r2 = searchTree(r->node, "method");
+			tok=r2;
+			int l;
+			char *s;
+			// Utilisation de getElementValue() pour traiter le type opaque 
+			s = getElementValue(tok->node, &l);
+			
+			if(!strncmp(s,"GET",l)){
+				printf("GET\n");
+				 
+				
 			}
+			
+			file->path[0]='\0';
+			
+			
 			purgeElement(&r);
+			purgeElement(&r2);
 		purgeTree(root);
 		} else {
-			writeDirectClient(requete->clientId,ERROR,strlen(ERROR));
+			strcpy(reponse->content, ERROR);
+			reponse->len = strlen(ERROR);
 		}
 	
 	

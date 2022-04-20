@@ -21,6 +21,10 @@ EXEC = server
 
 all: export notre
 
+run: notre
+	clear
+	./server
+
 export:
 	@echo "Copier coller la ligne ci-dessous"
 	export LD_LIBRARY_PATH=LD_LIBRARY_PATH:$(LIBPARS):$(LIBREQ)
@@ -35,7 +39,7 @@ prof:
 notre: debug dir $(OBJS) link
 
 link:
-	$(CC) $(FLAGS) -o $(EXEC) $(OBJ_PATH)*.o -L $(LIBPARS) -L $(LIBREQ) -lnotreparser -lrequest 
+	$(CC) $(FLAGS) -o $(EXEC) $(OBJ_PATH)*.o -L $(LIBPARS) -L $(LIBREQ) -lnotreparser -lrequest  -lmagic
 
 #server.o: server.c
 #	gcc -I $(LIBPARS) -I $(LIBREQ)/api -o server.o -c $(SERVER)/server.c
