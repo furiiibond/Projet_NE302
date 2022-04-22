@@ -12,24 +12,24 @@ LF = %x0A
 CRLF = CR LF 
 
 tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA 
+nicechar = "!" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / "/" / DQUOTE / DIGIT / ALPHA 
+pathchar = "/" / "!" / "$" / "%" / "&" / "'" / "+" / "-" / "." / "^" / "_" / "`" / "~" / DIGIT / ALPHA 
 
-nicechar = "!" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA 
+Config = * ReturnOptCom 1* ( Entry  * ( Comment / CRLF ) ) 
 
-Config = * Comment 1* ( Entry  * Comment )
+ReturnOptCom = [ Comment ] CRLF 
 
-Comment = "#" *VCHAR CRLF
+Comment = "#" * ( VCHAR / SP / HTAB ) 
 
-Entry =  Hostname "{" OWS [CRLF] Params "}"
+Entry =  Hostname OWS "{" OWS [CRLF] Params "}" 
 
-Params = DocRoot * nondef
+Hostname = 1* ( ALPHA / ( "." ALPHA ) ) 
 
-DocRoot = OWS "Root-dir" OWS "=" OWS DQUOTE path DQUOTE OWS ( Comment / CRLF )
+Params = DocRoot * nondef 
 
-path = * ( "/" * ALPHA ) [ "/" ]
+DocRoot = OWS "Root-dir" OWS "=" OWS DQUOTE Path DQUOTE OWS ReturnOptCom 
+Path = * ( "/" * pathchar ) 
 
-
-nondef = OWS param-name OWS "=" OWS value OWS ( Comment / CRLF )
-
+nondef = OWS param-name OWS "=" OWS value OWS ReturnOptCom 
 param-name = 1* nicechar 
-
 value = 1* nicechar 

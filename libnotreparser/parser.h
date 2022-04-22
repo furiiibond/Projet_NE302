@@ -34,6 +34,9 @@
 extern char *mem;
 extern char *no_go_zone;
 
+//Variable globale pour le premier Tag
+extern char first_tag[TAG_LEN];
+
 // main fonction that needs to be called from parser
 int construire(char *module, node *parent);
 

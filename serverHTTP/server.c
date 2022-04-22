@@ -57,6 +57,8 @@ int main(/*int argc, char *argv[]*/)
 	FillHostsParametres(); //Setup des options (see option_parser.h)
 	load_gramm_rule(HTTP_RULES);// charge la grammaire HTTP
 	
+	printf(CYN"#------------	Server Ready	------------#\n"NC);
+	
 	while ( 1 ) {
 		// on attend la reception d'une requete HTTP requete pointera vers une ressource allouée par librequest.
 		if ((requete=getRequest(8080)) == NULL ) return -1;
@@ -64,7 +66,7 @@ int main(/*int argc, char *argv[]*/)
 		// Affichage de debug
 		printf("#########################################\nDemande recue depuis le client %d\n",requete->clientId);
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
-		printf("Contenu de la demande\n%.*s\n\n",requete->len,requete->buf);
+		printf(YEL"Contenu de la demande"NC"\n%.*s\n\n",requete->len,requete->buf);
 		
 		
 		
@@ -75,6 +77,8 @@ int main(/*int argc, char *argv[]*/)
 		
 		//Reponse HTML
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
+		
+		printf(YEL"Contenu de la reponse"NC"\n%.*s\n\n",reponse.len,reponse.content);
 		
 		//Message Body (le fichier à transmettre)
 		send_file( requete->clientId, file);

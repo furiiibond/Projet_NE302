@@ -7,7 +7,9 @@
 #define ERROR "HTTP/1.0 400 SUCKA\r\n\r\n"
 #define REPONSE "HTTP/1.0 200 OK\r\nContent-type: text/plain\r\n\r\nHey Bro why did you send me this:\r\n"
 
-
+//CONSTANTES
+#define TRUE 1
+#define FALSE 0
 
 
 
@@ -16,9 +18,10 @@
 
 
 #define PATH_LEN_MAX 256
-#define TYPE_LEN_MAX 20
+#define TYPE_LEN_MAX 40
 typedef struct {
 	char path[PATH_LEN_MAX];
+	int length;
 	char type[TYPE_LEN_MAX];
 } Fichier;
 
@@ -47,8 +50,9 @@ typedef struct {
 //A faire: structure contenant les différentes options par site (pour liste chainée)
 // IMPORTANT choisir si on utilise le style apache2 ou le notre
 //exemple tiré de 000-default.conf (apache2)
+#define HOST_LEN_MAX 50
 struct Options {
-	char ServerName[50];
+	char ServerName[HOST_LEN_MAX];
 	char DocumentRoot[PATH_LEN_MAX];
 	
 	
@@ -65,6 +69,10 @@ extern struct Options* HostsParametres;
 
 
 
+// Module image Magic
+#define DEFAULT_TYPE "text/plain"
+
+
 //#####~Docs~#######
 //
 // apache2: 		https://www.liquidweb.com/kb/configure-apache-virtual-hosts-ubuntu-18-04/
@@ -74,5 +82,21 @@ extern struct Options* HostsParametres;
 //
 //
 //
+
+
+
+/* Nombre */
+#define GET		1
+#define HEAD	2
+#define POST	3
+#define PUT		4
+#define DELETE	5
+#define CONNECT	6
+#define OPTIONS	7
+#define TRACE	8
+
+
+
+
 
 #endif

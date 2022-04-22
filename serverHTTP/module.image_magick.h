@@ -6,8 +6,6 @@
 
 #include "parametres.h"
 
-#define DEFAULT_TYPE "text/plain"
-
 void get_file_type(Fichier f){
 	const char* tmp;
 	magic_t mag;

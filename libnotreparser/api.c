@@ -67,7 +67,7 @@ void purgeElement(_Token **r) {
 */
 int parseur(char *req, int len) {
     mem = req;
-    no_go_zone = mem + len;
+    no_go_zone = mem + len + 1;
 	createRoot(first_tag, req, len);
 
 
