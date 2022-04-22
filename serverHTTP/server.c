@@ -42,6 +42,7 @@ int send_file(unsigned int clientId, Fichier file){
 		exit(1);
 	len = st.st_size;
 		
+	printf("write message body\n");
 	writeDirectClient(clientId,ptr,len);
 	
 	close(fd);
@@ -64,9 +65,9 @@ int main(/*int argc, char *argv[]*/)
 		if ((requete=getRequest(8080)) == NULL ) return -1;
 
 		// Affichage de debug
-		printf("#########################################\nDemande recue depuis le client %d\n",requete->clientId);
+		printf(RED"#########################################"NC"\nDemande recue depuis le client %d\n",requete->clientId);
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
-		printf(YEL"Contenu de la demande"NC"\n%.*s\n\n",requete->len,requete->buf);
+		printf(YEL"Contenu de la demande"NC"\n%.*s\n",requete->len,requete->buf);
 		
 		
 		
@@ -78,12 +79,12 @@ int main(/*int argc, char *argv[]*/)
 		//Reponse HTML
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
 		
-		printf(YEL"Contenu de la reponse"NC"\n%.*s\n\n",reponse.len,reponse.content);
+		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len-4,reponse.content);
 		
 		//Message Body (le fichier à transmettre)
 		send_file( requete->clientId, file);
 		
-		
+		printf("["BLU"Fichier"NC":"MAG"%s"NC"] %s\n\n",file.type,file.path);
 		
 		
 		

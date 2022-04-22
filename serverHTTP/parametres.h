@@ -4,7 +4,9 @@
 #include "color.h"
 
 //Prof
-#define ERROR "HTTP/1.0 400 SUCKA\r\n\r\n"
+#define ERROR "HTTP/1.0 400 SUCKA\r\nContent-Type: text/html\r\n\r\n\
+<!DOCTYPE HTML> <html><body> <h1>YOU SUCKA</h1>\
+<img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/718smiley.svg/512px-718smiley.svg.png\"> </body></html>"
 #define REPONSE "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
 //Hey Bro why did you send me this:\r\n"
 
@@ -96,7 +98,13 @@ extern struct Options* HostsParametres;
 #define OPTIONS	7
 #define TRACE	8
 
-
+/* Constantes for Request Handler*/
+#define OK 1
+#define ERR_WRONG_VERSION 2
+#define ERR_HOST_HEADER_MISSING 3
+#define ERR_NON_EXISTING_HOST 4
+#define ERR_PATH_UNREACHABLE 5
+#define ERR_FSTAT 6
 
 
 

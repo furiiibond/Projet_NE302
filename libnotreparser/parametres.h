@@ -15,7 +15,7 @@
 // nb of char displayed by line in display_tree()
 #define DISPLAY_MAX 30
 //Profondeur maximale de la fonction display_tree()
-#define MAX_DEPTH 2
+#define MAX_DEPTH 0
 
 // If set to 1, will display the tree produced
 #define DISPLAY_TREE 0

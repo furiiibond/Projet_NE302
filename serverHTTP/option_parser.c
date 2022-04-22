@@ -14,23 +14,13 @@
 struct Options* HostsParametres;
 
 
-int FillHostsParametres(void){
-	
-	// HostsParametres = malloc(sizeof(struct Options));
-	// strcpy(HostsParametres->ServerName, "Sitecool.com");
-	// strcpy(HostsParametres->DocumentRoot, "/mnt/c/Users/J/OneDrive/3A/Cours_S2/Projet_NE302/Projet_NE302/www");
-	
-	// HostsParametres->next = malloc(sizeof(struct Options));
-	// strncpy(HostsParametres->next->ServerName, "NumeroDos.tv",HOST_LEN_MAX);
-	// strncpy(HostsParametres->next->DocumentRoot, "/home/userir/2",PATH_LEN_MAX);
-	
-	// HostsParametres->next->next = NULL;
-	
+int FillHostsParametres(void){	
 	
 	load_gramm_rule(CONF_RULES);// charge la grammaire HTTP
 	
-	int fd;
-	char * ptr;
+	
+	/* Ouverture du fichier de config $(SERV_CONFIG) */
+	int fd; char * ptr;
     if ((fd= open(SERV_CONFIG, O_RDWR)) == -1) {
         perror("Fichier de configuration serveur innexistant");
         exit(1);
@@ -43,16 +33,20 @@ int FillHostsParametres(void){
         exit(1);
 	}
     
+	// Parsing
 	if ( parseur(ptr, st.st_size) == FALSE){
 		perror("Fichier de configuration non valide");
 		exit(1);
 	}
 	
+	/** A faire:
+			vérifier si le fichier à été parsé entièrement,
+			sinon mettre un warning ("Possible Entry Miss")
+	*/
+	
 	_Token *r,*r2,*tok,*Entry_list;
 	Entry_list = searchTree( NULL, "Entry");
-	
 	struct Options* hostparlist = NULL;
-	
 	tok = Entry_list;
 	
 	if(!tok){ // Ne devrait pas arriver

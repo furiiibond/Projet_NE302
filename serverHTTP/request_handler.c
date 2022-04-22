@@ -60,13 +60,17 @@ int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file){
 			case GET:
 			case HEAD:
 				res_get = traiter_GET(root, file);
-				//strcpy(reponse->content, REPONSE);
-				//reponse->len = strlen(REPONSE);
+				//Note: si on implémente les ERR, passer sur un switch(res_get)
 				if (res_get == OK) {
-					sprintf(reponse->content, "HTTP/1.0 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n\r\n",file->type,file->length);
+					sprintf(reponse->content, "HTTP/1.0 200 OK\r\n"
+					"Content-type:%s\r\n"
+					"Content-length:%ld\r\n\r\n",
+					file->type,
+					file->length);
 					reponse->len = strlen(reponse->content);
 				}
 				else {
+					printf(ERROR);
 					strcpy(reponse->content, ERROR);
 					reponse->len = strlen(ERROR);
 				}

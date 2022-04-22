@@ -13,7 +13,7 @@ CRLF = CR LF
 
 tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA 
 nicechar = "!" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / "/" / DQUOTE / DIGIT / ALPHA 
-pathchar = "/" / "!" / "$" / "%" / "&" / "'" / "+" / "-" / "." / "^" / "_" / "`" / "~" / DIGIT / ALPHA 
+pathchar =  "!" / "$" / "%" / "&" / "'" / "+" / "-" / "." / "^" / "_" / "`" / "~" / DIGIT / ALPHA 
 
 Config = * ReturnOptCom 1* ( Entry  * ( Comment / CRLF ) ) 
 
@@ -28,7 +28,8 @@ Hostname = 1* ( ALPHA / ( "." ALPHA ) )
 Params = DocRoot * nondef 
 
 DocRoot = OWS "Root-dir" OWS "=" OWS DQUOTE Path DQUOTE OWS ReturnOptCom 
-Path =  1* pathchar  
+DIRname =  1* pathchar  
+Path = [ "/" ] * ( DIRname "/" ) DIRname
 
 nondef = OWS param-name OWS "=" OWS value OWS ReturnOptCom 
 param-name = 1* nicechar 
