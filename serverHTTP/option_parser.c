@@ -51,8 +51,7 @@ int FillHostsParametres(void){
 	_Token *r,*r2,*tok,*Entry_list;
 	Entry_list = searchTree( NULL, "Entry");
 	
-	struct Options* hostparlist = HostsParametres;
-	hostparlist = NULL;
+	struct Options* hostparlist = NULL;
 	
 	tok = Entry_list;
 	
@@ -67,16 +66,23 @@ int FillHostsParametres(void){
 			hostparlist = hostparlist->next;
 		}else{
 			hostparlist = malloc(sizeof(struct Options));
+			HostsParametres = hostparlist;
 		}
 		char *s; int l;
 		r = searchTree( tok->node, "Hostname");
 		s = getElementValue(r->node, &l);
 		memcpy(hostparlist->ServerName, s, l);
+		hostparlist->ServerName[l]='\0';
+		
+		printf("Filling %s infos\n",hostparlist->ServerName);
+		
 		purgeElement(&r);
 		r = searchTree( tok->node, "DocRoot");
 		r2 = searchTree( r->node, "Path");
 		s = getElementValue(r2->node, &l);
 		memcpy(hostparlist->DocumentRoot, s, l);
+		hostparlist->DocumentRoot[l]='\0';
+	
 		purgeElement(&r);
 		purgeElement(&r2);
 		

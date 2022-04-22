@@ -5,7 +5,8 @@
 
 //Prof
 #define ERROR "HTTP/1.0 400 SUCKA\r\n\r\n"
-#define REPONSE "HTTP/1.0 200 OK\r\nContent-type: text/plain\r\n\r\nHey Bro why did you send me this:\r\n"
+#define REPONSE "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
+//Hey Bro why did you send me this:\r\n"
 
 //CONSTANTES
 #define TRUE 1

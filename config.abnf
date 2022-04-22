@@ -28,7 +28,7 @@ Hostname = 1* ( ALPHA / ( "." ALPHA ) )
 Params = DocRoot * nondef 
 
 DocRoot = OWS "Root-dir" OWS "=" OWS DQUOTE Path DQUOTE OWS ReturnOptCom 
-Path = * ( "/" * pathchar ) 
+Path =  1* pathchar  
 
 nondef = OWS param-name OWS "=" OWS value OWS ReturnOptCom 
 param-name = 1* nicechar 
