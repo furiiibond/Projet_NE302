@@ -55,13 +55,21 @@ int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file){
 			printf("TRACE\n");
 			method = TRACE;
 		}
-		
+		int res_get;
 		switch(method){
 			case GET:
 			case HEAD:
-				traiter_GET(root, file);
-				strcpy(reponse->content, REPONSE);
-				reponse->len = strlen(REPONSE);
+				res_get = traiter_GET(root, file);
+				//strcpy(reponse->content, REPONSE);
+				//reponse->len = strlen(REPONSE);
+				if (res_get == OK) {
+					sprintf(reponse->content, "HTTP/1.0 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n\r\n",file->type,file->length);
+					reponse->len = strlen(reponse->content);
+				}
+				else {
+					strcpy(reponse->content, ERROR);
+					reponse->len = strlen(ERROR);
+				}
 			break;
 			default:
 			break;

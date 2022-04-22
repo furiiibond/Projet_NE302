@@ -22,8 +22,8 @@
 #define TYPE_LEN_MAX 40
 typedef struct {
 	char path[PATH_LEN_MAX];
-	int length;
 	char type[TYPE_LEN_MAX];
+	long length;
 } Fichier;
 
 #define HEADER_LEN_MAX 1000
