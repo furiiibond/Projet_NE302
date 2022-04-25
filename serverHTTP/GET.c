@@ -73,10 +73,10 @@ int traiter_GET(_Token *root, Fichier* file){
 	char last_char = *(file->path +total_path-1);
 	if (last_char == '/'){
 		
-			//get_default_page(file->path,total_path)
-			strncpy(file->path+total_path,
-					"index.html",
-					PATH_LEN_MAX-total_path );
+		//get_default_page(file->path,total_path)
+		strncpy(file->path+total_path,
+				"index.html",
+				PATH_LEN_MAX-total_path );
 		}
 	
 
@@ -89,7 +89,7 @@ int traiter_GET(_Token *root, Fichier* file){
     }
 	
 	//Met le MIME type du fichier dans file->type
-	get_file_type(file);
+	get_mime_type(file);
     
 	struct stat st;
     if (fstat(fichier, &st) == -1){
