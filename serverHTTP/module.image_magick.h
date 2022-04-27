@@ -13,8 +13,8 @@ struct MIME_Line {
 #define MIME_TAB_LEN 3
 struct MIME_Line MIME_tab[MIME_TAB_LEN] = {
 	{"js","application/javascript"},
-	{"css"," 	text/css"},
-	{"csv"," 	text/csv"}
+	{"css","text/css"},
+	{"csv","text/csv"}
 };
 
 
