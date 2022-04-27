@@ -22,6 +22,14 @@
 	de répondre à la requète avec le fichier dont le chemin aurait été placé dans une zone spécial
 	(comme ça la recopie serait limitée au nom du fichier)
 */
+/*
+	Ce qu'on a fait finalement:
+	Le request handler remplis une zone de mémoire (de taille constante HEADER_LEN_MAX)
+	RequestHandler parse la requête puis le reste du travail est relégué à d'autre programmes
+	RequestHandler return avec le numéro correspondant à la requète si tout c'est bien passé
+	puis le serveur (server.c) envoie donc la réponse construite et effectue ensuite
+	l'action correspondante à la méthode.
+*/
 
 int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file);
 

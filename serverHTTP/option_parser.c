@@ -42,10 +42,17 @@ int FillHostsParametres(void){
 	/** A faire:
 			vérifier si le fichier à été parsé entièrement,
 			sinon mettre un warning ("Possible Entry Miss")
+	{
+		_Token tok; int l;
+		tok = searchTree( NULL, "Config");
+		getElementValue(tok->node, &l);
+		if (l < st.st_size)
+			printf(MAG"Warning: Possible Entry Miss"NC" - Check your "SERV_CONFIG" file\n");
+	
 	*/
 	
 	_Token *r,*r2,*tok,*Entry_list;
-	Entry_list = searchTree( NULL, "Entry");
+	Entry_list = searchTree( NULL, "Entry"); // Le 1er arg est NULL donc utilise parse tree root
 	struct Options* hostparlist = NULL;
 	tok = Entry_list;
 	
@@ -55,10 +62,10 @@ int FillHostsParametres(void){
 	}
 	
 	while(tok != NULL){
-		if (hostparlist){
+		if (hostparlist){ /* Cas des autres boucles, insertion en queue */
 			hostparlist->next = malloc(sizeof(struct Options));
 			hostparlist = hostparlist->next;
-		}else{
+		}else{ /* Cas de la première boucle, met à jour le pointeur global */
 			hostparlist = malloc(sizeof(struct Options));
 			HostsParametres = hostparlist;
 		}

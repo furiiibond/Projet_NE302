@@ -15,9 +15,8 @@
 #include "request.h"
 
 // for parser
-
-// this will declare internal type used by the parser
-#include "httpparser.h"
+	// // this will declare internal type used by the parser
+	// #include "httpparser.h"
 #include "api.h"
 
 //
@@ -25,6 +24,8 @@
 #include "option_parser.h"
 #include "request_handler.h"
 
+
+//TODO: Fix for large files ( >1.4G )
 int send_file(unsigned int clientId, Fichier file){
 	
 	if (access( file.path, F_OK )) return -1;

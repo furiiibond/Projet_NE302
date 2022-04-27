@@ -8,6 +8,9 @@
 #include "GET.h"
 #include "module.image_magick.h"
 
+/*
+	On va faire plus de choses là dedans, donc mieux commencer à découper
+*/
 int traiter_GET(_Token *root, Fichier* file){
 	struct Options* host_prm = HostsParametres;
 	_Token *req = searchTree(root, "request-line");
