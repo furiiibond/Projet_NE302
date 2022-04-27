@@ -57,7 +57,6 @@ int get_mime_type(Fichier* f){
 	//assert(strlen(tmp)<=TYPE_LEN_MAX );
 	if (strlen(tmp)<=TYPE_LEN_MAX){
 		strcpy(f->type,tmp);
-		printf("ok\n");
 	}
 	else{
 		return -1; //Error 500
