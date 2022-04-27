@@ -89,7 +89,8 @@ int traiter_GET(_Token *root, Fichier* file){
     }
 	
 	//Met le MIME type du fichier dans file->type
-	get_mime_type(file);
+	if (get_mime_type(file) == -1)
+		return ERR_INTERNAL_SERVER;
     
 	struct stat st;
     if (fstat(fichier, &st) == -1){
