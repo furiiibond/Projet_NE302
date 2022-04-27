@@ -5,6 +5,7 @@
 
 #include "request_handler.h"
 #include "GET.h"
+#include "error_mes.h"
 
 //parser api
 #include "api.h"
@@ -55,27 +56,36 @@ int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file){
 			printf("TRACE\n");
 			method = TRACE;
 		}
-		int res_get;
+		int status_code;
 		switch(method){
 			case GET:
 			case HEAD:
-				res_get = traiter_GET(root, file);
+				status_code = traiter_GET(root, file);
 				//Note: si on implémente les ERR, passer sur un switch(res_get)
-				if (res_get == OK) {
-					sprintf(reponse->content, "HTTP/1.0 200 OK\r\n"
-					"Content-type:%s\r\n"
-					"Content-length:%ld\r\n\r\n",
-					file->type,
-					file->length);
-					reponse->len = strlen(reponse->content);
-				}
-				else {
-					printf(ERROR);
-					strcpy(reponse->content, ERROR);
-					reponse->len = strlen(ERROR);
+				switch (status_code){
+					case OK:	//200 OK
+						sprintf(reponse->content, ERROR_200);
+						reponse->len = strlen(reponse->content);
+					break;
+					case ERR_NOT_FOUND: //404 Not Found
+					case ERR_INTERNAL_SERVER:	//500 Internal Server Error
+					case ERR_HTTP_VERSION: //505 HTTP Version Not Supported - PAS ENCORE IMPLEMENTE
+						strcpy(reponse->content, TAB_ERROR[-1*status_code]);
+						reponse->len = strlen(TAB_ERROR[-1*status_code]);
 				}
 			break;
-			default:
+			case POST:
+			case PUT:
+			case DELETE:
+			case CONNECT:
+			case OPTIONS:
+			case TRACE:	//501 Not Implemented
+				strcpy(reponse->content, ERROR_501);
+				reponse->len = strlen(ERROR_501);
+			break;
+			default:	//400 Bad Request
+				strcpy(reponse->content, ERROR_400);
+				reponse->len = strlen(ERROR_400);
 			break;
 		}
 		

@@ -74,17 +74,22 @@ int main(/*int argc, char *argv[]*/)
 		HTML_Rep reponse;
 		Fichier file;
 		
-		RequestHandler(requete, &reponse, &file);
+		int method = RequestHandler(requete, &reponse, &file);
 		
 		//Reponse HTML
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
 		
 		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len-4,reponse.content);
 		
-		//Message Body (le fichier à transmettre)
-		send_file( requete->clientId, file);
+		//Action à faire en fonction de la methode
+		switch(method){
+			case GET:
+				//Message Body (le fichier à transmettre)
+				send_file(requete->clientId, file);
+				printf("["BLU"Fichier"NC":"MAG"%s"NC"] %s\n\n",file.type,file.path);
+				break;
+		}
 		
-		printf("["BLU"Fichier"NC":"MAG"%s"NC"] %s\n\n",file.type,file.path);
 		
 		
 		

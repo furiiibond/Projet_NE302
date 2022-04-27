@@ -49,7 +49,7 @@ int traiter_GET(_Token *root, Fichier* file){
 		purgeElement(&req);
 		purgeElement(&t);
 		purgeElement(&v);
-		return ERR_WRONG_VERSION;
+		return ERR_HTTP_VERSION;
 	}*/
 	
 	
@@ -62,7 +62,7 @@ int traiter_GET(_Token *root, Fichier* file){
 	int total_path = len_path + root_path;
 	
 	if(total_path > PATH_LEN_MAX){
-		
+		return ERR_NOT_FOUND;
 	}
 	
 	//Concaténation du path du dossier avec le absolute-path du fichier
@@ -85,7 +85,7 @@ int traiter_GET(_Token *root, Fichier* file){
 	if ((fichier= open(file->path, O_RDWR)) == -1) {
 		close(fichier);
 		printf(RED"ERROR"NC" file unreachable\n");
-		return ERR_PATH_UNREACHABLE;
+		return ERR_NOT_FOUND;
     }
 	
 	//Met le MIME type du fichier dans file->type
@@ -94,7 +94,7 @@ int traiter_GET(_Token *root, Fichier* file){
 	struct stat st;
     if (fstat(fichier, &st) == -1){
 		close(fichier);
-		return ERR_FSTAT;
+		return ERR_INTERNAL_SERVER;
 	}
 	
 	file->length = st.st_size;	//Longueur du fichier

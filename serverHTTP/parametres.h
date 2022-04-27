@@ -99,12 +99,16 @@ extern struct Options* HostsParametres;
 #define TRACE	8
 
 /* Constantes for Request Handler*/
-#define OK 1
-#define ERR_WRONG_VERSION 2
-#define ERR_HOST_HEADER_MISSING 3
-#define ERR_NON_EXISTING_HOST 4
-#define ERR_PATH_UNREACHABLE 5
-#define ERR_FSTAT 6
+#define OK 0
+#define ERR_DEFAULT -1
+#define ERR_NOT_FOUND -2
+#define ERR_INTERNAL_SERVER -3
+#define ERR_HTTP_VERSION -4
+#define ERR_HOST_HEADER_MISSING -5
+#define ERR_NON_EXISTING_HOST -6
+
+
+
 
 
 
