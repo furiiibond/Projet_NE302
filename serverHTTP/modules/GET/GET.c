@@ -11,7 +11,7 @@
 /*
 	On va faire plus de choses là dedans, donc mieux commencer à découper
 */
-int traiter_GET(_Token *root, Fichier* file){
+int traiter_GET(_Token *root, HTML_Rep* reponse, Fichier* file){
 	struct Options* host_prm = HostsParametres;
 	_Token *req = searchTree(root, "request-line");
 	_Token *t = searchTree(req->node, "absolute-path");
@@ -65,7 +65,7 @@ int traiter_GET(_Token *root, Fichier* file){
 	int total_path = len_path + root_path;
 	
 	if(total_path > PATH_LEN_MAX){
-		return ERR_NOT_FOUND;
+		return ERR_404; //File not found
 	}
 	
 	//Concaténation du path du dossier avec le absolute-path du fichier
@@ -88,21 +88,29 @@ int traiter_GET(_Token *root, Fichier* file){
 	if ((fichier= open(file->path, O_RDWR)) == -1) {
 		close(fichier);
 		printf(RED"ERROR"NC" file unreachable\n");
-		return ERR_NOT_FOUND;
-    }
+		return ERR_404; //File not found    
+	}
 	
 	//Met le MIME type du fichier dans file->type
 	if (get_mime_type(file) == -1)
-		return ERR_INTERNAL_SERVER;
+		return ERR_500; //Internal server error
     
 	struct stat st;
     if (fstat(fichier, &st) == -1){
 		close(fichier);
-		return ERR_INTERNAL_SERVER;
+		return ERR_500; //Internal server
 	}
 	
 	file->length = st.st_size;	//Longueur du fichier
 	
 	close(fichier);
+	
+	
+	/* On rempli la réponse */
+	snprintf(reponse->content, HEADER_LEN_MAX,
+		"HTTP/1.0 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n\r\n",
+			file->type, file->length);
+	reponse->len = strlen(reponse->content);
+	
 	return OK;
 }

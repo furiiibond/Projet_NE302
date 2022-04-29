@@ -1,7 +1,11 @@
 #ifndef PARAMETRESH
 #define PARAMETRESH
 
-#include "color.h"
+#include "annexe/color.h"
+
+//TODO: Split with annexe/global.h
+
+
 
 //Prof
 #define ERROR "HTTP/1.0 400 SUCKA\r\nContent-Type: text/html\r\n\r\n\
@@ -100,12 +104,13 @@ extern struct Options* HostsParametres;
 
 /* Constantes for Request Handler*/
 #define OK 0
-#define ERR_DEFAULT -1
-#define ERR_NOT_FOUND -2
-#define ERR_INTERNAL_SERVER -3
-#define ERR_HTTP_VERSION -4
-#define ERR_HOST_HEADER_MISSING -5
-#define ERR_NON_EXISTING_HOST -6
+#define ERR_400 -1
+#define ERR_404 -2
+#define ERR_405 -3
+#define ERR_500 -4
+#define ERR_505 -5
+// #define ERR_HOST_HEADER_MISSING
+// #define ERR_NON_EXISTING_HOST
 
 
 

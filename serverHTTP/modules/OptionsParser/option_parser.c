@@ -7,8 +7,10 @@
 #include <unistd.h>		// close
  #include <sys/mman.h>	// mmap
 
-#include "parametres.h"
+#include "../../parametres.h"
 #include "option_parser.h"
+
+// -L notreparser
 #include "api.h"
 
 struct Options* HostsParametres;

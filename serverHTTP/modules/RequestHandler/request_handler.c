@@ -4,8 +4,9 @@
 #include <stdint.h>
 
 #include "request_handler.h"
-#include "GET.h"
-#include "error_mes.h"
+#include "../ErrorHandler/error_handler.h"
+#include "../GET/GET.h"
+#include "../../annexe/error_mes.h" //Deprecated
 
 //parser api
 #include "api.h"
@@ -61,6 +62,7 @@ int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file){
 		
 		
 		int status_code;
+		/*
 		switch(method){
 			case GET:
 			case HEAD:
@@ -80,7 +82,7 @@ int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file){
 				}
 				Eventuellement déplacer le ErrorHandler(...) en dehors du switch(method)
 				Pour éviter plus de redondance
-				*/
+				*//*
 				switch (status_code){
 					case OK:	//200 OK
 						sprintf(reponse->content, ERROR_200);
@@ -106,28 +108,31 @@ int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file){
 				strcpy(reponse->content, ERROR_400);
 				reponse->len = strlen(ERROR_400);
 			break;
-		}
+		}*/
 		
-		/*
-		Proposition de réimplémentation:
+		
+		// Proposition de réimplémentation:
 		switch(method){
 			case GET:
 			case HEAD:
-				status_code = traiter_GET(root, file);
+				status_code = traiter_GET(root, reponse, file);
 			break;
 			case POST:
 			case PUT:
-				status_code = -405; //Erreur 500 méthode non supporté
+			case DELETE:
+			case CONNECT:
+			case OPTIONS:
+			case TRACE:
+				status_code = -405; //Erreur 405 méthode non supporté
 			break;
 			default:
 				status_code = -501; //Erreur 501 méthode non reconnue
 		}
 		if(status_code < 0)
-			ErrorHandler(message *requete, HTML_Rep* reponse,Fichier* file);
+			ErrorHandler(reponse, file, status_code);
+		// Less cluttered and
+		// probably more efficient / less redundant
 		
-		Less cluttered and
-		probably more efficient / less redundant
-		*/
 		
 		
 		

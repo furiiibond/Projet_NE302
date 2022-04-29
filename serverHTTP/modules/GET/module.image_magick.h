@@ -4,7 +4,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "parametres.h"
+// #include "../../parametres.h"
 
 struct MIME_Line {
 	char exension[10];

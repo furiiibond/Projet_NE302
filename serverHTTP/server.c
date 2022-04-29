@@ -16,13 +16,13 @@
 
 // for parser
 	// // this will declare internal type used by the parser
-	// #include "httpparser.h"
+	// #include "annexe/httpparser.h"
 #include "api.h"
 
 //
 #include "parametres.h"
-#include "option_parser.h"
-#include "request_handler.h"
+#include "modules/OptionsParser/option_parser.h"
+#include "modules/RequestHandler/request_handler.h"
 
 
 //TODO: Fix for large files ( >1.4G )

@@ -9,7 +9,11 @@
 <!DOCTYPE HTML> <html><body> <h1>404 Not Found</h1>\
 <img src=\"https://http.cat/404\"> </body></html>"
 
-#define ERROR_500 "HTTP/1.0 500 Internal Server Error\r\nContent-Type: text/html\r\n\r\n\
+#define ERROR_405 "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\n\r\n\
+<!DOCTYPE HTML> <html><body> <h1>405 ______</h1>\
+<img src=\"https://http.cat/405\"> </body></html>"
+
+#define ERROR_500 "HTTP/1.0 500 Internal Server Error\r\nContent-Type: text/html\r\nAllow:GET,HEAD\r\n\r\n\
 <!DOCTYPE HTML> <html><body> <h1>500 Internal Server Error</h1>\
 <img src=\"https://http.cat/500\"> </body></html>"
 
@@ -22,4 +26,4 @@
 <img src=\"https://http.cat/505\"> </body></html>"
 
 
-#define TAB_ERROR (char*[]){"",ERROR_400,ERROR_404,ERROR_500,ERROR_505}
+#define TAB_ERROR (char*[]){"",ERROR_400,ERROR_404,ERROR_405,ERROR_500,ERROR_505}
