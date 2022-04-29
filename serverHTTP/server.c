@@ -17,6 +17,8 @@
 // for parser
 #include "api.h"
 
+#define SV_IMPLEMENTATION
+
 //
 #include "annexe/global.h"
 #include "modules/OptionsParser/option_parser.h"
@@ -72,11 +74,17 @@ int main(/*int argc, char *argv[]*/)
 		
 		HTML_Rep reponse;
 		Fichier file;
+		HeaderStruct headers; 
 		
-		int method = RequestHandler(requete, &reponse, &file);
+		int method = RequestHandler(requete, &headers, &reponse, &file);
 		
-		//Reponse HTML
+		//HEADER response
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
+		
+		
+		// writeDirectClient(requete->clientId, "Connection: close\r\n", 19);
+		//Termine la partie Header
+		// writeDirectClient(requete->clientId, "\r\n", 2);
 		
 		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len-4,reponse.content);
 		
@@ -97,8 +105,12 @@ int main(/*int argc, char *argv[]*/)
 		
 		
 		
-		/*if ()*/
-		requestShutdownSocket(requete->clientId);
+		if (!headers.connection.keepAlive){
+			printf(YEL"Shutding down connection\n"NC);
+			requestShutdownSocket(requete->clientId);
+		}
+		
+	printf("Free Request ___\n");
 	// on ne se sert plus de requete a partir de maintenant, on peut donc liberer...
 	freeRequest(requete);
 	}

@@ -1,14 +1,14 @@
 LIBPARS = ../../libnotreparser
 LIBREQ = ../../librequest-0.5
-modules = OptionsParser RequestHandler GET ErrorHandler
 
 
+MODULES = OptionsParser RequestHandler GET ErrorHandler Headers
 OBJ_PATH=objs/
 
 FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api
 
 objs: dir OptionsParser RequestHandler GET ErrorHandler
-	for moduleName in $(modules) ; do \
+	for moduleName in $(MODULES) ; do \
 		gcc $(FLAGS) -c $$moduleName/*.c  -o $(OBJ_PATH)$$moduleName.o ; \
 	done
 	@echo Done

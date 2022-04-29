@@ -31,5 +31,5 @@
 	l'action correspondante à la méthode.
 */
 
-int RequestHandler(message *requete, HTML_Rep* reponse,Fichier* file);
+int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fichier* file);
 

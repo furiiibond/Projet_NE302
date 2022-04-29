@@ -1,10 +1,3 @@
-#ifndef COLOR
-
-/*
-Color 0:desactivated / 1:activated
-*/
-#define COLOR 1
-
 #if COLOR
 	#define RED    "\033[0;31m" //rouge
 	#define BLU   "\033[0;34m"  //bleu
@@ -21,6 +14,4 @@ Color 0:desactivated / 1:activated
 	#define MAG ""
 	#define CYN ""
 	#define NC     ""
-#endif
-
 #endif

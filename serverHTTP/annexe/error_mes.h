@@ -9,8 +9,8 @@
 <!DOCTYPE HTML> <html><body> <h1>404 Not Found</h1>\
 <img src=\"https://http.cat/404\"> </body></html>"
 
-#define ERROR_405 "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\n\r\n\
-<!DOCTYPE HTML> <html><body> <h1>405 ______</h1>\
+#define ERROR_405 "HTTP/1.0 405 Not Found\r\nContent-Type: text/html\r\n\r\n\
+<!DOCTYPE HTML> <html><body> <h1>405 Method Not Allowed</h1>\
 <img src=\"https://http.cat/405\"> </body></html>"
 
 #define ERROR_500 "HTTP/1.0 500 Internal Server Error\r\nContent-Type: text/html\r\nAllow:GET,HEAD\r\n\r\n\
