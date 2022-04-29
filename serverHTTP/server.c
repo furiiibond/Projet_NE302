@@ -15,12 +15,10 @@
 #include "request.h"
 
 // for parser
-	// // this will declare internal type used by the parser
-	// #include "annexe/httpparser.h"
 #include "api.h"
 
 //
-#include "parametres.h"
+#include "global.h"
 #include "modules/OptionsParser/option_parser.h"
 #include "modules/RequestHandler/request_handler.h"
 

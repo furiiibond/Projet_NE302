@@ -64,6 +64,7 @@ modules:
 clean:
 	@echo cleaning objects and exec
 	rm -rf $(OBJ_PATH)*.o $(EXEC)
+	cd module && make clean
 	rmdir --ignore-fail-on-non-empty $(OBJ_PATH)
 
 
