@@ -1,4 +1,4 @@
-#include "../../parametres.h"
+#include "../../annexe/global.h"
 #include "../../annexe/error_mes.h"
 #include <string.h>
 

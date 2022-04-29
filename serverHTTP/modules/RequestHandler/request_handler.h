@@ -2,7 +2,7 @@
 #ifndef MAXCLIENT //défini dans request.h
 #include "request.h"
 #endif
-#include "../../global.h"
+#include "../../annexe/global.h"
 /*
 	Est utile comme interprète principal entre le serveur et
 		les implémentations de méthodes comme GET ou HEAD.

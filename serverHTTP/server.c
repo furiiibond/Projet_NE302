@@ -18,7 +18,7 @@
 #include "api.h"
 
 //
-#include "global.h"
+#include "annexe/global.h"
 #include "modules/OptionsParser/option_parser.h"
 #include "modules/RequestHandler/request_handler.h"
 
@@ -89,14 +89,15 @@ int main(/*int argc, char *argv[]*/)
 				break;
 		}
 		
-		
-		
-		
-		
-		
-		
-		
 		endWriteDirectClient(requete->clientId);
+		
+		
+		
+		
+		
+		
+		
+		/*if ()*/
 		requestShutdownSocket(requete->clientId);
 	// on ne se sert plus de requete a partir de maintenant, on peut donc liberer...
 	freeRequest(requete);

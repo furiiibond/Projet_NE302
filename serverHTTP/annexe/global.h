@@ -1,1 +1,1 @@
-#include "parametres.h"
+#include "../parametres.h"

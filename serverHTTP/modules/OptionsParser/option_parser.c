@@ -7,7 +7,7 @@
 #include <unistd.h>		// close
  #include <sys/mman.h>	// mmap
 
-#include "../../global.h"
+#include "../../annexe/global.h"
 #include "option_parser.h"
 
 // -L notreparser
