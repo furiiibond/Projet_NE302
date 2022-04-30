@@ -20,7 +20,7 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	strncpy(tmp,s,l);
 	tmp[l]='\0';
 	int a,b;
-	sscanf(tmp,"HHTP/%d.%d",&a,&b);
+	sscanf(tmp,"HTTP/%d.%d",&a,&b);
 	headers->httpVersion=10*a+b;
 	purgeElement(&t);
 	// Method
@@ -58,29 +58,34 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	
 	//Host-header
 	req = searchTree(root, "Host-header");
-	t = searchTree(req->node, "host");
-	headers->host.data = getElementValue(t->node, (int *) &(headers->host.count));
-	purgeElement(&req);
-	purgeElement(&t);
-	
-	//Connection-header:
-	req = searchTree(root, "Connection-header");
-	t = searchTree(req->node, "connection-option");
-	ptr=t;
-	headers->connection.keepAlive=0;
-	headers->connection.close=0;
-	while (ptr){
-		s = getElementValue(ptr->node, &l);
-		if (!strncmp(s,"keep-alive",10))
-			headers->connection.keepAlive=1;
-		else if(!strncmp(s,"close",5))
-			headers->connection.close=1;
-		else 
-			printf(RED"Unsuported connection-opiton: "NC"%.*s\n",l,s);
-		ptr =ptr->next;
+	if (req){
+		t = searchTree(req->node, "host");
+		headers->host.data = getElementValue(t->node, (int *) &(headers->host.count));
+		purgeElement(&t);
 	}
 	purgeElement(&req);
-	purgeElement(&t);
+
+	//Connection-header:
+	req = searchTree(root, "Connection-header");
+	if (req){
+		t = searchTree(req->node, "connection-option");
+		ptr=t;
+		headers->connection.keepAlive=0;
+		headers->connection.close=0;
+		while (ptr){
+			s = getElementValue(ptr->node, &l);
+			if (!strncmp(s,"keep-alive",10))
+				headers->connection.keepAlive=1;
+			else if(!strncmp(s,"close",5))
+				headers->connection.close=1;
+			else 
+				printf(RED"Unsuported connection-opiton: "NC"%.*s\n",l,s);
+			ptr =ptr->next;
+		}
+		purgeElement(&t);
+	}
+	purgeElement(&req);
+	
 	if(headers->connection.keepAlive && headers->connection.close)
 		return ERR_400;
 		

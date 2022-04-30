@@ -61,7 +61,7 @@ int main(/*int argc, char *argv[]*/)
 	
 	printf(CYN"#------------	Server Ready	------------#\n"NC);
 	
-	while ( 1 ) {
+	//while ( 1 ) {
 		// on attend la reception d'une requete HTTP requete pointera vers une ressource allouée par librequest.
 		if ((requete=getRequest(8080)) == NULL ) return -1;
 
@@ -113,8 +113,8 @@ int main(/*int argc, char *argv[]*/)
 	printf("Free Request ___\n");
 	// on ne se sert plus de requete a partir de maintenant, on peut donc liberer...
 	freeRequest(requete);
-	}
-	printf("exit?\n");
+	//}
+	printf("exit\n");
 	close_gramm_rule();
 	return (1);
 }
