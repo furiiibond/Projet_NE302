@@ -37,6 +37,7 @@ typedef struct {
   String_View host;
   struct conect connection;
   String_View absolutePath;
+  String_View accept[10];
 } HeaderStruct;
 
 
@@ -57,7 +58,8 @@ extern struct Options* HostsParametres;
 	que ce soit en version 1.0 (DocumentRoot), ou 1.1 (ServerName).
 */
 
-
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 
 /* Nombre */
@@ -76,7 +78,8 @@ extern struct Options* HostsParametres;
 #define ERR_404 -2
 #define ERR_405 -3
 #define ERR_500 -4
-#define ERR_505 -5
+#define ERR_501 -5
+#define ERR_505 -6
 // #define ERR_HOST_HEADER_MISSING
 // #define ERR_NON_EXISTING_HOST
 

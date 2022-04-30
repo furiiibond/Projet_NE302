@@ -61,7 +61,7 @@ int main(/*int argc, char *argv[]*/)
 	
 	printf(CYN"#------------	Server Ready	------------#\n"NC);
 	
-	//while ( 1 ) {
+	while ( 1 ) {
 		// on attend la reception d'une requete HTTP requete pointera vers une ressource allouée par librequest.
 		if ((requete=getRequest(8080)) == NULL ) return -1;
 
@@ -80,13 +80,10 @@ int main(/*int argc, char *argv[]*/)
 		
 		//HEADER response
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
-		
-		
-		// writeDirectClient(requete->clientId, "Connection: close\r\n", 19);
-		//Termine la partie Header
-		// writeDirectClient(requete->clientId, "\r\n", 2);
-		
 		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len-4,reponse.content);
+		
+		//Termine la partie header avec un deuxième CRLF
+		writeDirectClient(requete->clientId, "\r\n", 2);
 		
 		//Action à faire en fonction de la methode
 		switch(method){
@@ -100,20 +97,15 @@ int main(/*int argc, char *argv[]*/)
 		endWriteDirectClient(requete->clientId);
 		
 		
-		
-		
-		
-		
-		
 		if (!headers.connection.keepAlive){
 			printf(YEL"Shutding down connection\n"NC);
 			requestShutdownSocket(requete->clientId);
 		}
 		
-	printf("Free Request ___\n");
-	// on ne se sert plus de requete a partir de maintenant, on peut donc liberer...
-	freeRequest(requete);
-	//}
+		printf("Free Request ___\n");
+		// on ne se sert plus de requete a partir de maintenant, on peut donc liberer...
+		freeRequest(requete);
+	}
 	printf("exit\n");
 	close_gramm_rule();
 	return (1);

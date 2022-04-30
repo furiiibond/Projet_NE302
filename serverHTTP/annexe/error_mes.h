@@ -21,9 +21,9 @@
 <!DOCTYPE HTML> <html><body> <h1>501 Not Implemented</h1>\
 <img src=\"https://http.cat/501\"> </body></html>"
 
-#define ERROR_505 "HTTP/1.0 HTTP Version Not Supported\r\nContent-Type: text/html\r\n\r\n\
-<!DOCTYPE HTML> <html><body> <h1>405 Method Not Allowed</h1>\
+#define ERROR_505 "HTTP/1.0 505 HTTP Version Not Supported\r\nContent-Type: text/html\r\n\r\n\
+<!DOCTYPE HTML> <html><body> <h1>505 HTTP Version Not Supported</h1>\
 <img src=\"https://http.cat/505\"> </body></html>"
 
 
-#define TAB_ERROR (char*[]){"",ERROR_400,ERROR_404,ERROR_405,ERROR_500,ERROR_505}
+#define TAB_ERROR (char*[]){"",ERROR_400,ERROR_404,ERROR_405,ERROR_500,ERROR_501,ERROR_505}

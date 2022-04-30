@@ -5,6 +5,6 @@
 #include "../../annexe/global.h"
 
 
-int traiter_GET(_Token *root, HTML_Rep* reponse, Fichier* file);
+int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file);
 
 #endif

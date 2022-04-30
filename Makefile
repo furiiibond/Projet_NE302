@@ -1,4 +1,4 @@
-
+MAKEFLAGS += --no-print-directory
 
 LIBPARS = libnotreparser
 LIBREQ = librequest-0.5

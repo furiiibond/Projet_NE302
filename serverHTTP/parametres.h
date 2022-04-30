@@ -10,11 +10,11 @@
 #define HTTP_RULES "fullrfc.abnf","HTTP-message"
 
 // Structure fichier
-#define PATH_LEN_MAX 256
-#define TYPE_LEN_MAX 40
+#define PATH_LEN_MAX 1024
+#define TYPE_LEN_MAX 64
 
 // Structure HTML_Rep
-#define HEADER_LEN_MAX 1000
+#define HEADER_LEN_MAX 1024
 
 /**
  \Répartiton des paramètres:
@@ -29,7 +29,7 @@
 
 
 // Pour option_parser
-#define HOST_LEN_MAX 50
+#define HOST_LEN_MAX 64
 
 
 // Module image Magic
@@ -42,6 +42,7 @@
 // .htaccess: 		https://httpd.apache.org/docs/2.4/howto/htaccess.html
 // default page:	https://stackoverflow.com/questions/19322345/how-do-i-change-the-default-index-page-in-apache
 //
-//
+// percent-encoding to unix style paths:
+// https://brettterpstra.com/2015/11/16/shell-tricks-convert-file-urls-to-unix-paths/
 
 #endif
