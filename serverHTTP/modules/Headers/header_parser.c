@@ -4,8 +4,10 @@
 //Prototopo
 void meth_trouve(HeaderStruct* headers,char* s, int l);
 
-
-
+/*
+	Cette fonction remplis la structure header avec les valeurs
+	lues dans l'arbre de la requète parsée
+*/
 int traiter_Header(_Token *root, HeaderStruct* headers){
 	_Token *req,*t,*ptr;
 	int l;
@@ -16,13 +18,13 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	headers->connection.keepAlive=0;
 	headers->connection.close=0;
 	
-	// Request Target
+	// Request Target [Obligatoire]
 	req = searchTree(root, "request-line");
 	t = searchTree(req->node, "absolute-path");
 	headers->absolutePath.data = getElementValue(t->node, (int *) &(headers->absolutePath.count));
 	purgeElement(&t);
 	
-	// HTTP-version
+	// HTTP-version [Obligatoire]
 	t = searchTree(req->node, "HTTP-version");
 	s = getElementValue(t->node, &l);
 	char tmp[l+1];
@@ -33,14 +35,14 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	headers->httpVersion=10*a+b;
 	purgeElement(&t);
 	
-	// Method
+	// Method [Obligatoire]
 	t = searchTree(req->node, "method");
 	s = getElementValue(t->node, &l);
 	meth_trouve(headers, s, l);
 	purgeElement(&t);
 	purgeElement(&req);
 	
-	//Host-header
+	//Host-header [Optionnel]
 	req = searchTree(root, "Host-header");
 	if (req){
 		t = searchTree(req->node, "host");
@@ -49,7 +51,7 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	}
 	purgeElement(&req);
 
-	//Connection-header:
+	//Connection-header [Optionnel]
 	req = searchTree(root, "Connection-header");
 	if (req){
 		t = searchTree(req->node, "connection-option");
@@ -68,7 +70,7 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	}
 	purgeElement(&req);
 	
-	//Accept:
+	//Accept [Optionnel]
 	req = searchTree(root, "Accept-header");
 	if (req){
 		t = searchTree(req->node, " media-range");
@@ -77,6 +79,7 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 		while (ptr && i<10){
 			headers->accept[i].data = getElementValue(ptr->node, (int *) &(headers->accept[i].count));
 			ptr =ptr->next;
+			i++;
 		}
 		purgeElement(&t);
 	}
@@ -85,7 +88,7 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	
 		
 	/* DEBBUG */	
-	printf("httpVersion = %d\n",headers->httpVersion);
+	printf("httpVersion = %d.%d\n",headers->httpVersion/10,headers->httpVersion%10);
 	printf("Host:" SV_Fmt "\n", SV_Arg(headers->host));
 	return OK;
 }
@@ -96,6 +99,7 @@ int max(int x, int y){
 
 /* Trouve la meth
 ode */
+// Attention Dr White
 void meth_trouve(HeaderStruct* headers,char* s, int l){
 	headers->method = 0;
 	// Utilisation du max pour match précisément

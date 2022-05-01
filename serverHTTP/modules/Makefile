@@ -2,7 +2,7 @@ LIBPARS = ../../libnotreparser
 LIBREQ = ../../librequest-0.5
 
 
-MODULES = OptionsParser RequestHandler Methodes ErrorHandler Headers Semantique $(ls)
+MODULES = OptionsParser RequestHandler Methodes ErrorHandler Headers Semantique
 OBJ_PATH=objs/
 
 FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api

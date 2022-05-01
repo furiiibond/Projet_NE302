@@ -4,11 +4,11 @@
 #include <stdint.h>
 
 #include "request_handler.h"
+//inclusion des autres modules
 #include "../ErrorHandler/error_handler.h"
 #include "../Headers/header_parser.h"
 #include "../Semantique/semantique.h"
 #include "../Methodes/methode.h"
-#include "../../annexe/error_mes.h" //Deprecated
 
 //parser api
 #include "api.h"
@@ -46,10 +46,7 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fi
 			break;
 			default:
 				status_code = ERR_501; //Erreur 501 méthode non reconnue
-		}
-		// Less cluttered and
-		// probably more efficient / less redundant
-		
+		}		
 		
 		purgeTree(root);
 		
@@ -60,10 +57,11 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fi
 	}
 
 	if(status_code < 0){
-		ErrorHandler(reponse, /*file,*/ status_code);
+		ErrorHandler(reponse, headers, /*file,*/ status_code);
 		method=status_code;
 	}
 	
-	
+	/* Retourne la méthode si tout c'est bien passé
+		le code error sinon */
 	return method;
 }

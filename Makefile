@@ -1,8 +1,12 @@
 MAKEFLAGS += --no-print-directory
 
+NAMES=LAPIERRE_GARDE_ROUGE_RANC
+GROUPE=Groupe7
+
 LIBPARS = libnotreparser
 LIBREQ = librequest-0.5
 SERVER = serverHTTP
+IGNORE = EXEC
 
 EXEC = server
 
@@ -25,4 +29,5 @@ clean:
 	rm -f server
 	cd $(SERVER) && make clean
 
-#gcc -I $(LIBPARS) -I $(LIBREQ)/api  -L $(LIBPARS) -L $(LIBREQ) -o $(EXEC) $(SERVER)/server.c -lnotreparser -lrequest 
+tar:
+	tar -cvzf PROJET_NE302-$(GROUPE)-$(NAMES).tar.gz * --exclude="$(IGNORE)"

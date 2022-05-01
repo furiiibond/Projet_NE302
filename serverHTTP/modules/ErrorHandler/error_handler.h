@@ -8,4 +8,4 @@
 	le buffer de la réponse HTML en fonction.
 */
 
-void ErrorHandler(HTML_Rep* reponse/*,Fichier* file*/, int error_code);
+void ErrorHandler(HTML_Rep* reponse, HeaderStruct* headers/*,Fichier* file*/, int error_code);

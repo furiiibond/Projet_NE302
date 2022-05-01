@@ -14,35 +14,30 @@ int cat_n_with_percent_encoding(char* path, const char* data,int count);
 int verif_path_sanity(char *path,int len);
 
 /*
-	On va faire plus de choses là dedans, donc mieux commencer à découper
+	Fais appel aux autres modules pour valider la requête, semantiquement
 */
 int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	struct Options* host_ptr;
-	
 	host_ptr = get_host_ptr(headers);
-	
-	int root_path = strlen(host_ptr->DocumentRoot);
-	int len = headers->absolutePath.count + root_path;
-	
-	if(len > PATH_LEN_MAX){
-		return ERR_400; //Chemin trop long
-	}
+	int len;
 	
 	//Concaténation du path du dossier avec le absolute-path du fichier
 	strcpy(file->path,host_ptr->DocumentRoot);
 	len = cat_n_with_percent_encoding(file->path, headers->absolutePath.data, headers->absolutePath.count);
+	if(len >= PATH_LEN_MAX){
+		return ERR_400; //Chemin trop long
+	}
 	file->path[len] = '\0';//Ajout de la sentinelle
-	printf("absolute-path: %s\n",file->path);
 	
 	/* Sanitize Path */
-	
+	int root_path = strlen(host_ptr->DocumentRoot);	
 	if(verif_path_sanity(file->path+root_path,len-root_path)!=OK){
 		return ERR_403; // 403 Forbidden
 	}
 	
 	char last_char = *(file->path +len-1);
 	if (last_char == '/'){
-		//get_default_page(file->path)
+		//get_default_page(file->path) //A implémenter
 		strncpy(file->path+len,
 				"index.html",
 				PATH_LEN_MAX-len );
@@ -73,7 +68,7 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	
 	/* On rempli la réponse */
 	reponse->len = snprintf(reponse->content, HEADER_LEN_MAX,
-		SERV_VERSION " 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
+		SERV_VERSION(headers->httpVersion) " 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
 			file->type, file->length);
 	
 	if(!headers->connection.keepAlive)
@@ -85,7 +80,11 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	return OK;
 }
 
-
+/* Gestion du multi-site
+	renvoie un pointeur vers la structure d'option
+	du site correspondant au champ Host.
+	Renvoie le site par défaut si non-trouvé
+*/
 struct Options* get_host_ptr(HeaderStruct* headers){
 	struct Options* host_ptr = HostsParametres;
 	
@@ -102,6 +101,11 @@ struct Options* get_host_ptr(HeaderStruct* headers){
 	return host_ptr;
 }
 
+
+/* Vérifie si le path du origin-form ne traverse pas
+	des endroits non-accessible
+	(ex: tout dossier avant le root-directory)
+*/
 int verif_path_sanity(char *path,int len){
 	String_View sv = {len,path};
 	if(*sv.data=='/') {sv.data++; sv.count--;}
@@ -117,15 +121,10 @@ int verif_path_sanity(char *path,int len){
 	
 	do { 
 	line = sv_chop_by_delim(&sv, '/');    //line ends before '/', rule start after '/'
-	
-	printf("repertory: " SV_Fmt "\n",SV_Arg(line));
-	
 	if (!strncmp(line.data,".",line.count))
 		depth+=0;
-	else if (!strncmp(line.data,"..",line.count)){
+	else if (!strncmp(line.data,"..",line.count))
 		depth-=1;
-		puts("coucou");
-	}
 	else
 		depth+=1;
 	} while(sv.count > 0 && depth >= 0);
@@ -133,6 +132,10 @@ int verif_path_sanity(char *path,int len){
 	return depth<0 ? -1 : OK;
 }
 
+
+/* Fonctionnement identique à strncat()
+	Mais avec le traitement de l'encodage par pourcent en plus
+*/
 int cat_n_with_percent_encoding(char* path, const char* data,int count){
 	int i=0,j=0,nb;
 	while(path[i]!='\0')i++;
@@ -148,11 +151,9 @@ int cat_n_with_percent_encoding(char* path, const char* data,int count){
 			path[i]=nb;
 			j+=2;
 		}
-		printf("%c[%hhX]",path[i],path[i]);
 		i++;
 		j++;
 	}
-	printf("\n");
 	return i;
 }
 

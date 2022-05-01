@@ -1,11 +1,8 @@
 #ifndef GLOBALH
 #define GLOBALH
 
-
 #include "../parametres.h"
-
-#include "sv.h"
-
+#include "sv.h" // Librairy StringView
 
 //Prof
 #define ERROR "HTTP/1.0 400 SUCKA\r\nContent-Type: text/plain\r\n\r\n\ Error 400\r\n"
@@ -26,16 +23,20 @@ typedef struct {
 	int len;
 } HTML_Rep;
 
-struct conect {
+/*
+	Structure contennant les headers supportés par notre serveur.
+	Permet d'avoir un accès plus facile à ces données que de chercher
+	dans la requète parsée à chaque fois.
+*/
+struct connect {
 	int keepAlive;
 	int close;
 };
-
 typedef struct {
   int httpVersion;
   int method;
   String_View host;
-  struct conect connection;
+  struct connect connection;
   String_View absolutePath;
   String_View accept[10];
 } HeaderStruct;
@@ -81,10 +82,6 @@ extern struct Options* HostsParametres;
 #define ERR_500 -5
 #define ERR_501 -6
 #define ERR_505 -7
-// #define ERR_HOST_HEADER_MISSING
-// #define ERR_NON_EXISTING_HOST
-
-
 
 
 

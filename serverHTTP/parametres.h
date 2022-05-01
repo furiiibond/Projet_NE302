@@ -19,15 +19,16 @@
 /**
  \Répartiton des paramètres:
 	-La page par défault est définie on a per directory basis in the .htaccess file
-		otherwise it's index.html
+		otherwise it's index.html [Pas Fait encore]
 	-Les paramètres du site sont définis globalement dans $(SERV_CONFIG_PATH)/$(SERV_CONFIG)
-		If options are missing there's no default, should raise an error
+		If options are missing there's no default, should raise an error [Fait]
 */
 //#define SERV_CONFIG_PATH "."
 #define SERV_CONFIG "server.conf"
 #define CONF_RULES "config.abnf","Config"
 
-#define SERV_VERSION "HTTP/1.1"
+// Version HTTP pour les réponses
+#define SERV_VERSION(v)  (v >= 11) ? "HTTP/1.1" : "HTTP/1.0"
 
 // Pour option_parser
 #define HOST_LEN_MAX 64

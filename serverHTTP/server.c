@@ -80,7 +80,7 @@ int main(/*int argc, char *argv[]*/)
 		
 		//HEADER response
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
-		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len-4,reponse.content);
+		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len,reponse.content);
 		
 		//Termine la partie header avec un deuxième CRLF
 		writeDirectClient(requete->clientId, "\r\n", 2);

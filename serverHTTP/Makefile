@@ -1,9 +1,4 @@
 
-# En fonction de l'emplacement des fichiers so faire
-# export LD_LIBRARY_PATH=.
-# ou
-# export LD_LIBRARY_PATH=../libnotreparser/:../librequest-0.5/ <--bypass symbolic links
-
 LIBPARS = ../libnotreparser
 LIBREQ = ../librequest-0.5
 SERVER = .
@@ -68,16 +63,6 @@ clean:
 	rmdir --ignore-fail-on-non-empty $(OBJ_PATH)
 
 
-# Tests
-debug:
-	@echo TEST DEBUG OBJ FILES
-	@echo "$(SRC) | $(OBJS)"
-	@echo OK
-
 
 .PHONY: export all notre clean modules
 
-
-# Legacy code :)
-prof:
-	gcc -I ../libparser -I ../librequest-0.5/api  -L ../libparser -L ../librequest-0.5 -o server server.c -lparser -lrequest

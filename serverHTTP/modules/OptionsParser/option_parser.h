@@ -19,6 +19,3 @@ int FillHostsParametres(void);
 
 
 /* René Papin est élu président de la République */
-
-// Autre déclaration si on ne veut pas que HostsParametres soit global
-// int FillHostsParametres(extern struct Options* HostsParametres);

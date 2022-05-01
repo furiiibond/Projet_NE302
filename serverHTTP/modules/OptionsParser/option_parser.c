@@ -15,7 +15,9 @@
 
 struct Options* HostsParametres;
 
-
+/* Remplis la structure des options de site
+	en lisant le fichier de configuration (définit dans parametres.h)
+*/
 int FillHostsParametres(void){	
 	
 	load_gramm_rule(CONF_RULES);// charge la grammaire HTTP
@@ -41,17 +43,16 @@ int FillHostsParametres(void){
 		exit(1);
 	}
 	
-	/** A faire:
-			vérifier si le fichier à été parsé entièrement,
-			sinon mettre un warning ("Possible Entry Miss")
-	{
-		_Token tok; int l;
-		tok = searchTree( NULL, "Config");
-		getElementValue(tok->node, &l);
-		if (l < st.st_size)
-			printf(MAG"Warning: Possible Entry Miss"NC" - Check your "SERV_CONFIG" file\n");
-	
+	/*
+		vérifie si le fichier à été parsé entièrement,
+		sinon mettre un warning ("Possible Entry Miss")
 	*/
+	_Token* t; int l;
+	t = searchTree( NULL, "Config");
+	getElementValue(t->node, &l);
+	if (l < st.st_size)
+		printf(MAG"Warning: Possible Entry Miss"NC" - Check your "SERV_CONFIG" file\n");
+	
 	
 	_Token *r,*r2,*tok,*Entry_list;
 	Entry_list = searchTree( NULL, "Entry"); // Le 1er arg est NULL donc utilise parse tree root

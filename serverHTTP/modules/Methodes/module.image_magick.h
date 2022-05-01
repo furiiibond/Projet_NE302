@@ -4,7 +4,6 @@
 #include <string.h>
 #include <assert.h>
 
-// #include "../../parametres.h"
 
 struct MIME_Line {
 	char exension[10];
@@ -37,7 +36,7 @@ void get_mime_from_file_extension(Fichier* f){
 	}
 }
 
-/*trouve le MIME type d'un fichier et l'ecrit dans f->type*/
+/* Trouve le MIME type d'un fichier et l'ecrit dans f->type */
 int get_mime_type(Fichier* f){
 	const char* tmp;
 	magic_t mag;
