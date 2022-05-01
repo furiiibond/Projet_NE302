@@ -10,6 +10,8 @@
 
 //Prototypes
 struct Options* get_host_ptr(HeaderStruct* headers);
+int cat_n_with_percent_encoding(char* path, const char* data,int count);
+int verif_path_sanity(char *path,int len);
 
 /*
 	On va faire plus de choses là dedans, donc mieux commencer à découper
@@ -20,41 +22,36 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	host_ptr = get_host_ptr(headers);
 	
 	int root_path = strlen(host_ptr->DocumentRoot);
-	int total_path = headers->absolutePath.count + root_path;
+	int len = headers->absolutePath.count + root_path;
 	
-	if(total_path > PATH_LEN_MAX){
+	if(len > PATH_LEN_MAX){
 		return ERR_400; //Chemin trop long
 	}
 	
-	/* Percent encoding */
-	// Youpi%20!
-	
 	//Concaténation du path du dossier avec le absolute-path du fichier
 	strcpy(file->path,host_ptr->DocumentRoot);
-	strncat(file->path, headers->absolutePath.data, headers->absolutePath.count);
-	file->path[total_path] = '\0';//Ajout de la sentinelle
+	len = cat_n_with_percent_encoding(file->path, headers->absolutePath.data, headers->absolutePath.count);
+	file->path[len] = '\0';//Ajout de la sentinelle
+	printf("absolute-path: %s\n",file->path);
 	
 	/* Sanitize Path */
-	// If below root: 403 Forbidden
-	// Compter les dossiers traversé:
-	//		dossier normal > +=1
-	//		.			   > +=0
-	//		-			   > -=1
-	// Si négatif à un moment -> ERR_403
 	
-	char last_char = *(file->path +total_path-1);
+	if(verif_path_sanity(file->path+root_path,len-root_path)!=OK){
+		return ERR_403; // 403 Forbidden
+	}
+	
+	char last_char = *(file->path +len-1);
 	if (last_char == '/'){
-		//get_default_page(file->path,total_path)
-		strncpy(file->path+total_path,
+		//get_default_page(file->path)
+		strncpy(file->path+len,
 				"index.html",
-				PATH_LEN_MAX-total_path );
+				PATH_LEN_MAX-len );
 	}
 	
 
 	int fichier;
 	//vérifie qu'on peut ouvrir le fichier
-	if ((fichier= open(file->path, O_RDWR)) == -1) {
-		close(fichier);
+	if ((fichier = open(file->path, O_RDWR)) == -1) {
 		printf(RED"ERROR"NC" file unreachable\n");
 		return ERR_404; //File not found    
 	}
@@ -76,7 +73,7 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	
 	/* On rempli la réponse */
 	reponse->len = snprintf(reponse->content, HEADER_LEN_MAX,
-		"HTTP/1.0 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
+		SERV_VERSION " 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
 			file->type, file->length);
 	
 	if(!headers->connection.keepAlive)
@@ -105,3 +102,95 @@ struct Options* get_host_ptr(HeaderStruct* headers){
 	return host_ptr;
 }
 
+int verif_path_sanity(char *path,int len){
+	String_View sv = {len,path};
+	if(*sv.data=='/') {sv.data++; sv.count--;}
+	
+	// If below root: 403 Forbidden
+	// Compter les dossiers traversé:
+	//		dossier normal > +=1
+	//		.			   > +=0
+	//		-			   > -=1
+	// Si négatif à un moment -> ERR_403
+	int depth=0;
+	String_View line;
+	
+	do { 
+	line = sv_chop_by_delim(&sv, '/');    //line ends before '/', rule start after '/'
+	
+	printf("repertory: " SV_Fmt "\n",SV_Arg(line));
+	
+	if (!strncmp(line.data,".",line.count))
+		depth+=0;
+	else if (!strncmp(line.data,"..",line.count)){
+		depth-=1;
+		puts("coucou");
+	}
+	else
+		depth+=1;
+	} while(sv.count > 0 && depth >= 0);
+
+	return depth<0 ? -1 : OK;
+}
+
+int cat_n_with_percent_encoding(char* path, const char* data,int count){
+	int i=0,j=0,nb;
+	while(path[i]!='\0')i++;
+	
+	while(i<PATH_LEN_MAX && j<count ){
+		
+		if(data[j]!='%'){
+			path[i]=data[j];
+		}else
+		{
+			nb=42;
+			sscanf(&data[j+1],"%X",&nb);
+			path[i]=nb;
+			j+=2;
+		}
+		printf("%c[%hhX]",path[i],path[i]);
+		i++;
+		j++;
+	}
+	printf("\n");
+	return i;
+}
+
+
+/*
+//Retour
+void get_default_page(char* path,int len){
+	
+	int fd;
+	char ht_path[PATH_LEN_MAX]
+	strcpy(ht_path,path);
+	strncpy(ht_path+len,".htaccess",PATH_LEN_MAX-len);
+	
+	//vérifie qu'on peut ouvrir le fichier
+	if ((fd= open(ht_path, O_RDWR)) == -1) {
+		strncpy(path+len, "index.html", PATH_LEN_MAX-len );
+	}
+	else{
+		struct stat st;
+		if (fstat(fichier, &st) != -1){
+			char * addr
+			if ((addr = mmap(NULL, st.st_size, PROT_WRITE, MAP_PRIVATE, fi, 0)) == NULL){
+				//Look for DirectoryIndex
+				String_View line,rule,ht_file={addr,st.st_size};
+				
+				
+				do { 
+				line = sv_chop_by_delim(&ht_file, '\n');    //line ends before '\n', rule start after '\n'
+				rule = sv_chop_by_delim(&line, ' ');    //rule ends before ' ', line starts after ' ' (and ends before '\n')
+				cmp = strncmp("DirectoryIndex",rule.data,rule.count);
+				} while(rule.count > 0 && cmp);    //While we haven't found the string
+		
+			}
+		}else{
+		strncpy(path+len, "index.html", PATH_LEN_MAX-len );
+		}
+		close(fd);
+	}
+	
+}
+*/

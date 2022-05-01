@@ -27,6 +27,7 @@
 #define SERV_CONFIG "server.conf"
 #define CONF_RULES "config.abnf","Config"
 
+#define SERV_VERSION "HTTP/1.1"
 
 // Pour option_parser
 #define HOST_LEN_MAX 64

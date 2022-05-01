@@ -17,6 +17,7 @@
 
 int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fichier* file){
 	int res,status_code;
+	int method;
 	if ((res=parseur(requete->buf,requete->len))) {
 		_Token *root;
 
@@ -25,11 +26,12 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fi
 		root=getRootTree();
 		
 		traiter_Header(root, headers);
+		method = headers->method;
 		
 		status_code = verifSemantique(headers);
 		
 		if (status_code == OK)
-		switch(headers->method){
+		switch(method){
 			case GET:
 			case HEAD:
 				status_code = traiter_GET(headers, reponse, file);
@@ -57,9 +59,11 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fi
 		status_code = ERR_400;
 	}
 
-	if(status_code < 0)
+	if(status_code < 0){
 		ErrorHandler(reponse, /*file,*/ status_code);
+		method=status_code;
+	}
 	
 	
-	return headers->method;
+	return method;
 }

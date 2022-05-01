@@ -75,11 +75,12 @@ extern struct Options* HostsParametres;
 /* Constantes for Request Handler*/
 #define OK 0
 #define ERR_400 -1
-#define ERR_404 -2
-#define ERR_405 -3
-#define ERR_500 -4
-#define ERR_501 -5
-#define ERR_505 -6
+#define ERR_403 -2
+#define ERR_404 -3
+#define ERR_405 -4
+#define ERR_500 -5
+#define ERR_501 -6
+#define ERR_505 -7
 // #define ERR_HOST_HEADER_MISSING
 // #define ERR_NON_EXISTING_HOST
 
