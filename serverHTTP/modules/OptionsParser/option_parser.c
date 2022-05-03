@@ -47,11 +47,14 @@ int FillHostsParametres(void){
 		vérifie si le fichier à été parsé entièrement,
 		sinon mettre un warning ("Possible Entry Miss")
 	*/
-	_Token* t; int l;
+	_Token* t; int l; //char *s;
 	t = searchTree( NULL, "Config");
-	getElementValue(t->node, &l);
-	if (l < st.st_size)
+	/*s = */getElementValue(t->node, &l);
+	if (l < st.st_size){
 		printf(MAG"Warning: Possible Entry Miss"NC" - Check your "SERV_CONFIG" file\n");
+		// printf("File size: %ld\t -  Config len: %d\n",st.st_size,l);
+		// printf("Content of parsed thing:\n%.*s[EOF]\n",l,s);
+	}
 	
 	
 	_Token *r,*r2,*tok,*Entry_list;

@@ -66,7 +66,7 @@ int main(/*int argc, char *argv[]*/)
 		if ((requete=getRequest(8080)) == NULL ) return -1;
 
 		// Affichage de debug
-		printf(RED"#########################################"NC"\nDemande recue depuis le client %d\n",requete->clientId);
+		printf(RED"\n#########################################"GRN"\nDemande recue depuis le client %d\n"NC,requete->clientId);
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
 		printf(YEL"Contenu de la demande"NC"\n%.*s\n",requete->len,requete->buf);
 		

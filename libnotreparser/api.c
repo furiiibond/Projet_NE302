@@ -73,7 +73,7 @@ int parseur(char *req, int len) {
 
     int r = construire(first_tag, getRootTree());
 	
-	((node*) getRootTree())->len_value = req-mem;
+	((node*) getRootTree())->len_value = mem-req;
 
 	FIX_FINAL_NE_PAS_TOUCHER();
 
