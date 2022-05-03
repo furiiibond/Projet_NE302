@@ -24,9 +24,6 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	//Concaténation du path du dossier avec le absolute-path du fichier
 	strcpy(file->path,host_ptr->DocumentRoot);
 	len = cat_n_with_percent_encoding(file->path, headers->absolutePath.data, headers->absolutePath.count);
-	if(len >= PATH_LEN_MAX){
-		return ERR_400; //Chemin trop long
-	}
 	file->path[len] = '\0';//Ajout de la sentinelle
 	
 	/* Sanitize Path */
@@ -58,7 +55,7 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	struct stat st;
     if (fstat(fichier, &st) == -1){
 		close(fichier);
-		return ERR_500; //Internal server
+		return ERR_500; //Internal server error
 	}
 	
 	file->length = st.st_size;	//Longueur du fichier
@@ -67,8 +64,9 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	
 	
 	/* On rempli la réponse */
-	reponse->len = snprintf(reponse->content, HEADER_LEN_MAX,
-		SERV_VERSION(headers->httpVersion) " 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
+	reponse->len = snprintf(reponse->content, HEADER_LEN_MAX, SERV_VERSION(headers->httpVersion) );
+	reponse->len += snprintf(reponse->content+reponse->len, HEADER_LEN_MAX,
+		" 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
 			file->type, file->length);
 	
 	if(!headers->connection.keepAlive)
@@ -79,6 +77,9 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	
 	return OK;
 }
+
+/* ------------ Annexe ------------ */
+
 
 /* Gestion du multi-site
 	renvoie un pointeur vers la structure d'option
@@ -135,6 +136,7 @@ int verif_path_sanity(char *path,int len){
 
 /* Fonctionnement identique à strncat()
 	Mais avec le traitement de l'encodage par pourcent en plus
+   Renvoie la longueur de la nouvelle chaine de charactères
 */
 int cat_n_with_percent_encoding(char* path, const char* data,int count){
 	int i=0,j=0,nb;

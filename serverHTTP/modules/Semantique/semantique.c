@@ -10,5 +10,9 @@ int verifSemantique(HeaderStruct* headers){
 	if(headers->httpVersion >= 11 && headers->host.count == 0)
 		return ERR_400;
 	
+	// Si l'absolute path est plus grand que la valeur maximale supporté par le serveur
+	if(headers->absolutePath.count>=PATH_LEN_MAX)
+		return ERR_414;
+	
 	return OK;
 }

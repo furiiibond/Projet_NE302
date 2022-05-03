@@ -21,7 +21,8 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	// Request Target [Obligatoire]
 	req = searchTree(root, "request-line");
 	t = searchTree(req->node, "absolute-path");
-	headers->absolutePath.data = getElementValue(t->node, (int *) &(headers->absolutePath.count));
+	headers->absolutePath.data = getElementValue(t->node, &l);
+	headers->absolutePath.count = l;
 	purgeElement(&t);
 	
 	// HTTP-version [Obligatoire]
@@ -46,7 +47,8 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	req = searchTree(root, "Host-header");
 	if (req){
 		t = searchTree(req->node, "host");
-		headers->host.data = getElementValue(t->node, (int *) &(headers->host.count));
+		headers->host.data = getElementValue(t->node, &l);
+		headers->host.count = l;
 		purgeElement(&t);
 	}
 	purgeElement(&req);

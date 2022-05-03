@@ -79,9 +79,10 @@ extern struct Options* HostsParametres;
 #define ERR_403 -2
 #define ERR_404 -3
 #define ERR_405 -4
-#define ERR_500 -5
-#define ERR_501 -6
-#define ERR_505 -7
+#define ERR_414 -5
+#define ERR_500 -6
+#define ERR_501 -7
+#define ERR_505 -8
 
 
 

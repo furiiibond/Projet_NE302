@@ -58,9 +58,8 @@ modules:
 # Cleaning the files
 clean:
 	@echo cleaning objects and exec
-	rm -rf $(OBJ_PATH)*.o $(EXEC)
+	rm -rf $(OBJ_PATH) $(EXEC)
 	cd modules && make clean
-	rmdir --ignore-fail-on-non-empty $(OBJ_PATH)
 
 
 

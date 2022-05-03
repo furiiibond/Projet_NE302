@@ -19,6 +19,10 @@
 <!DOCTYPE HTML> <html><body> <h1>405 Method Not Allowed</h1>\
 <img src=\"https://http.cat/405\"> </body></html>"
 
+#define ERROR_414 " 414 Request-Uri Too Long\r\nContent-Type: text/html\r\n\r\n\
+<!DOCTYPE HTML> <html><body> <h1>414 Request-Uri Too Long</h1>\
+<img src=\"https://http.cat/414\"> </body></html>"
+
 #define ERROR_500 " 500 Internal Server Error\r\nContent-Type: text/html\r\nAllow:GET,HEAD\r\n\r\n\
 <!DOCTYPE HTML> <html><body> <h1>500 Internal Server Error</h1>\
 <img src=\"https://http.cat/500\"> </body></html>"
@@ -32,4 +36,4 @@
 <img src=\"https://http.cat/505\"> </body></html>"
 
 
-#define TAB_ERROR (char*[]){"",ERROR_400,ERROR_403,ERROR_404,ERROR_405,ERROR_500,ERROR_501,ERROR_505}
+#define TAB_ERROR (char*[]){"",ERROR_400,ERROR_403,ERROR_404,ERROR_405,ERROR_414,ERROR_500,ERROR_501,ERROR_505}

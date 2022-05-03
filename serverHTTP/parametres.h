@@ -10,7 +10,7 @@
 #define HTTP_RULES "fullrfc.abnf","HTTP-message"
 
 // Structure fichier
-#define PATH_LEN_MAX 1024
+#define PATH_LEN_MAX 8000
 #define TYPE_LEN_MAX 64
 
 // Structure HTML_Rep
