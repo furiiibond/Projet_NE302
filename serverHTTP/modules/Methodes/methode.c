@@ -12,11 +12,15 @@
 struct Options* get_host_ptr(HeaderStruct* headers);
 int cat_n_with_percent_encoding(char* path, const char* data,int count);
 int verif_path_sanity(char *path,int len);
+Header_List* set_VerAndStatus( Header_List* reponseHL, HeaderStruct* headers);
+Header_List* add_ContentType( Header_List* reponseHL, Fichier* file);
+
+
 
 /*
 	Fais appel aux autres modules pour valider la requête, semantiquement
 */
-int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
+int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseHL, Fichier* file){
 	struct Options* host_ptr;
 	host_ptr = get_host_ptr(headers);
 	int len;
@@ -64,22 +68,69 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file){
 	
 	
 	/* On rempli la réponse */
+	//HTTP Version
 	reponse->len = snprintf(reponse->content, HEADER_LEN_MAX, SERV_VERSION(headers->httpVersion) );
+	//Status Code + Content-Type + Content-Length
 	reponse->len += snprintf(reponse->content+reponse->len, HEADER_LEN_MAX,
 		" 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
 			file->type, file->length);
-	
+	//Connection
 	if(!headers->connection.keepAlive)
 		reponse->len += snprintf(reponse->content+reponse->len,
 		HEADER_LEN_MAX-reponse->len,
 		"Connection: close\r\n");
 	
+	/** DYNAMIC ALLOCATION --------------------- */
+	//Fonction pour remplir la header list
+	set_VerAndStatus(reponseHL,headers);
+	add_ContentType(reponseHL,file);
+	/*
+	add_ContentLength(reponseHL,headers,File);
+	add_Connection(reponseHL,headers);
+	*/	
+	/** ---------------------------------------- */
 	
 	return OK;
 }
 
-/* ------------ Annexe ------------ */
+/** DYNAMIC ALLOCATION ------------------------------------------ */
+/* ------ Header List func ------ */
 
+// C'est marrant pcq on a l'impression de donner plus de liberté (/flexibilité)
+// En utilisant des mallocs, mais au final la plupart des champs sont cappé par
+// un max (un define dans parametres.h)
+// Étant donné qu'on a controle sur ça, ne vaudrait-t-il mieux pas rester juste
+// sur un buffer de taille fixe ???
+// Exemple pour Content Type:
+//	-	"Content-Type: " -> 14 char
+//	-	"%s",buffer[TYPE_LEN_MAX] -> y char
+//	-	"\r\n"			 -> 2 char
+//  TYPE_LEN_MAX = 64
+//	MAX = 14 + 64 + 2 (supérieur à 16+y) 
+
+Header_List* set_VerAndStatus( Header_List* reponseHL, HeaderStruct* headers){
+	reponseHL->header.data[7] = '0' + (headers->httpVersion >= 11);
+	strncpy(reponseHL->header.data + 9,  "200 OK\r\n",  100-9);
+	reponseHL->header.count = 19;
+	return reponseHL;
+}
+
+Header_List* add_ContentType( Header_List* reponseHL, Fichier* file){
+	Header_List* ptr = reponseHL;
+	while(ptr->next) ptr=ptr->next;
+	ptr->next = malloc(sizeof(Header_List));
+	ptr=ptr->next;
+	ptr->header.count = 16 + strlen(file->type);
+	ptr->header.data = malloc( sizeof(char) * ptr->header.count );
+	ptr->next=NULL;
+	snprintf(ptr->header.data , ptr->header.count,
+		"Content-type:%s\r\n",
+			file->type);
+	return ptr;
+}
+/** ------------------------------------------------------------- */
+
+/* ------------ Annexe ------------ */ // <-- Nécessite son propre fichier surement
 
 /* Gestion du multi-site
 	renvoie un pointeur vers la structure d'option

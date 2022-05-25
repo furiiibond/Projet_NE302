@@ -23,6 +23,16 @@ typedef struct {
 	int len;
 } HTML_Rep;
 
+/** DYNAMIC ALLOCATION ---
+	NOUVEAU Type pour la réponse
+	Liste chainée de Header (String_View)
+	(Il faut malloc de l'espace puis le free)*/
+typedef struct hl {
+	String_View header;
+	struct hl *next;
+} Header_List;
+/** ---------------------- */
+
 /*
 	Structure contennant les headers supportés par notre serveur.
 	Permet d'avoir un accès plus facile à ces données que de chercher

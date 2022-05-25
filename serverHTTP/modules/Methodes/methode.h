@@ -9,6 +9,6 @@
 */
 
 //Même si elle s'appelle traiter GET, cette fonction est aussi utilisé pour traiter HEAD
-int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Fichier* file);
+int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseHL, Fichier* file);
 
 #endif

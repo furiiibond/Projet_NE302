@@ -15,7 +15,7 @@
 
 
 
-int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fichier* file){
+int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseHL, Fichier* file){
 	int res,status_code;
 	int method;
 	if ((res=parseur(requete->buf,requete->len))) {
@@ -34,7 +34,7 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fi
 		switch(method){
 			case GET:
 			case HEAD:
-				status_code = traiter_GET(headers, reponse, file);
+				status_code = traiter_GET(headers, reponse, reponseHL, file);
 			break;
 			case POST:
 			case PUT:
@@ -62,6 +62,6 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse,Fi
 	}
 	
 	/* Retourne la méthode si tout c'est bien passé
-		le code error sinon */
+		le code d'erreur sinon */
 	return method;
 }

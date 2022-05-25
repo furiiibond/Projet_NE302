@@ -25,32 +25,13 @@
 #include "modules/RequestHandler/request_handler.h"
 
 
-//TODO: Fix for large files ( >1.4G )
-int send_file(unsigned int clientId, Fichier file){
-	
-	if (access( file.path, F_OK )) return -1;
-	
-	char * ptr;
-    int len, fd;
-	if (( fd= open(file.path, O_RDWR)) == -1) {
-		perror("open");
-		exit(1);
-	}
-	struct stat st;
-	if (fstat(fd, &st) == -1)
-		exit(1);
-	if ((ptr = mmap(NULL, st.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0)) == NULL)
-		exit(1);
-	len = st.st_size;
-		
-	printf("write message body\n");
-	writeDirectClient(clientId,ptr,len);
-	
-	close(fd);
-	return 0;
-}
+int send_file(unsigned int clientId, Fichier file);
+int writeHeaders(unsigned int clientId, Header_List reponseHL);// DYNAMIC ALLOCATION
 
 
+/**
+ * MAIN !!
+ */
 int main(/*int argc, char *argv[]*/)
 {
 	message *requete;
@@ -58,6 +39,17 @@ int main(/*int argc, char *argv[]*/)
 	
 	FillHostsParametres(); //Setup des options (see option_parser.h)
 	load_gramm_rule(HTTP_RULES);// charge la grammaire HTTP
+	
+	/** DYNAMIC ALLOCATION
+	Declaration d'une Header List
+	 - Header initial */
+	char init[100]="HTTP/1.1 ........................";
+	Header_List reponseHL={
+	    { 9, init },
+		NULL
+	};
+	reponseHL.header.data[7]='5';
+	/** ----------------------- */
 	
 	printf(CYN"#------------	Server Ready	------------#\n"NC);
 	
@@ -75,12 +67,15 @@ int main(/*int argc, char *argv[]*/)
 		HTML_Rep reponse;
 		Fichier file;
 		HeaderStruct headers; 
+		reponseHL.next = NULL;// DYNAMIC ALLOCATION
 		
-		int method = RequestHandler(requete, &headers, &reponse, &file);
+		int method = RequestHandler(requete, &headers, &reponse, &reponseHL, &file);
 		
 		//HEADER response
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
 		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len,reponse.content);
+
+		writeHeaders(requete->clientId, reponseHL);// DYNAMIC ALLOCATION
 		
 		//Termine la partie header avec un deuxième CRLF
 		writeDirectClient(requete->clientId, "\r\n", 2);
@@ -109,4 +104,49 @@ int main(/*int argc, char *argv[]*/)
 	printf("exit\n");
 	close_gramm_rule();
 	return (1);
+}
+
+/** DYNAMIC ALLOCATION */
+int writeHeaders(unsigned int clientId, Header_List reponseHL){
+	//writeDirectClient(clientId, reponseHL.header.data, reponseHL.header.count);
+	printf(MAG "DEBUG: %.*s", (int) reponseHL.header.count, reponseHL.header.data);
+	Header_List *ptr;
+	ptr = reponseHL.next;
+	Header_List *ptr2;
+	while(ptr){
+		//writeDirectClient(clientId, ptr->header.data, ptr->header.count);
+		printf("%.*s", (int) ptr->header.count, ptr->header.data);
+		ptr2 = ptr->next;
+		free(ptr->header.data);
+		free(ptr);
+		ptr = ptr2;
+	}
+	printf(NC "\n++++\n");
+	//Eventually, last CRLF
+	return 0;
+}
+
+//TODO: Fix for large files ( >1.4G )
+int send_file(unsigned int clientId, Fichier file){
+	
+	if (access( file.path, F_OK )) return -1;
+	
+	char * ptr;
+    int len, fd;
+	if (( fd= open(file.path, O_RDWR)) == -1) {
+		perror("open");
+		exit(1);
+	}
+	struct stat st;
+	if (fstat(fd, &st) == -1)
+		exit(1);
+	if ((ptr = mmap(NULL, st.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0)) == NULL)
+		exit(1);
+	len = st.st_size;
+		
+	printf("write message body\n");
+	writeDirectClient(clientId,ptr,len);
+	
+	close(fd);
+	return 0;
 }

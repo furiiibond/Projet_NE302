@@ -34,7 +34,7 @@
 
 typedef struct {
     size_t count;
-    const char *data;
+    /*const*/ char *data;
 } String_View;
 
 #define SV(cstr_lit) sv_from_parts(cstr_lit, sizeof(cstr_lit) - 1)
@@ -53,8 +53,8 @@ typedef struct {
 //   String_View name = ...;
 //   printf("Name: "SV_Fmt"\n", SV_Arg(name));
 
-SVDEF String_View sv_from_parts(const char *data, size_t count);
-SVDEF String_View sv_from_cstr(const char *cstr);
+SVDEF String_View sv_from_parts(/*const*/ char *data, size_t count);
+SVDEF String_View sv_from_cstr(/*const*/ char *cstr);
 SVDEF String_View sv_trim_left(String_View sv);
 SVDEF String_View sv_trim_right(String_View sv);
 SVDEF String_View sv_trim(String_View sv);
@@ -76,7 +76,7 @@ SVDEF uint64_t sv_to_u64(String_View sv);
 
 #ifdef SV_IMPLEMENTATION
 
-SVDEF String_View sv_from_parts(const char *data, size_t count)
+SVDEF String_View sv_from_parts(/*const*/ char *data, size_t count)
 {
     String_View sv;
     sv.count = count;
@@ -84,7 +84,7 @@ SVDEF String_View sv_from_parts(const char *data, size_t count)
     return sv;
 }
 
-SVDEF String_View sv_from_cstr(const char *cstr)
+SVDEF String_View sv_from_cstr(/*const*/ char *cstr)
 {
     return sv_from_parts(cstr, strlen(cstr));
 }
