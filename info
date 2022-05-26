@@ -1,0 +1,8 @@
+strace -> debug appels kernel
+ltrace -> debug appels fonctions
+
+valgrind -> debug malloc/free
+lsof -> list openned files
+	( [lsof +D www] pour voir les fichiers web non fermé)
+
+ 

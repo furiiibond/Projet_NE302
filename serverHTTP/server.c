@@ -129,8 +129,8 @@ int writeHeaders(unsigned int clientId, Header_List reponseHL){
 //TODO: Fix for large files ( >1.4G )
 int send_file(unsigned int clientId, Fichier file){
 	
-	if (access( file.path, F_OK )) return -1;
-	
+	// if (access( file.path, F_OK )) return -1; // On a déjà checké normalement
+	// Les if ne devraient pas être utile vu qu'on déjà vérifié tout.
 	char * ptr;
     int len, fd;
 	if (( fd= open(file.path, O_RDWR)) == -1) {

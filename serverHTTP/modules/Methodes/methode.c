@@ -1,6 +1,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -12,6 +13,7 @@
 struct Options* get_host_ptr(HeaderStruct* headers);
 int cat_n_with_percent_encoding(char* path, const char* data,int count);
 int verif_path_sanity(char *path,int len);
+void get_default_page(char* path, int len);
 Header_List* set_VerAndStatus( Header_List* reponseHL, HeaderStruct* headers);
 Header_List* add_ContentType( Header_List* reponseHL, Fichier* file);
 
@@ -38,10 +40,10 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 	
 	char last_char = *(file->path +len-1);
 	if (last_char == '/'){
-		//get_default_page(file->path) //A implémenter
-		strncpy(file->path+len,
+		get_default_page(file->path, len); //A implémenter
+		/*strncpy(file->path+len,
 				"index.html",
-				PATH_LEN_MAX-len );
+				PATH_LEN_MAX-len );*/
 	}
 	
 
@@ -211,40 +213,52 @@ int cat_n_with_percent_encoding(char* path, const char* data,int count){
 }
 
 
-/*
+
 //Retour
 void get_default_page(char* path,int len){
-	
 	int fd;
-	char ht_path[PATH_LEN_MAX]
+	char ht_path[PATH_LEN_MAX];
 	strcpy(ht_path,path);
 	strncpy(ht_path+len,".htaccess",PATH_LEN_MAX-len);
 	
 	//vérifie qu'on peut ouvrir le fichier
-	if ((fd= open(ht_path, O_RDWR)) == -1) {
-		strncpy(path+len, "index.html", PATH_LEN_MAX-len );
-	}
-	else{
+	if ((fd= open(ht_path, O_RDWR))>=0){
 		struct stat st;
-		if (fstat(fichier, &st) != -1){
-			char * addr
-			if ((addr = mmap(NULL, st.st_size, PROT_WRITE, MAP_PRIVATE, fi, 0)) == NULL){
+		if (fstat(fd, &st) != -1){
+			char * addr;
+			if ((addr = mmap(NULL, st.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0))){
 				//Look for DirectoryIndex
-				String_View line,rule,ht_file={addr,st.st_size};
+				String_View line,rule,ht_file={st.st_size,addr};
 				
-				
+				int cmp=1;
 				do { 
 				line = sv_chop_by_delim(&ht_file, '\n');    //line ends before '\n', rule start after '\n'
 				rule = sv_chop_by_delim(&line, ' ');    //rule ends before ' ', line starts after ' ' (and ends before '\n')
 				cmp = strncmp("DirectoryIndex",rule.data,rule.count);
-				} while(rule.count > 0 && cmp);    //While we haven't found the string
-		
+				} while( line.count> 0 && cmp);    //While we haven't found the string
+				
+				if(cmp == 0){ //On a donc trouvé "DirectoryIndex"
+					do {
+						rule = sv_chop_by_delim(&line, ' ');//Chop every entry by whitespaces
+						strncpy(path+len, rule.data, PATH_LEN_MAX-rule.count );
+						path[len+rule.count]='\0';
+						cmp = open(path, O_RDWR);// test access
+						//printf("file:%.*s open:%d\n",(int)rule.count,rule.data,cmp);
+					}while( cmp <0 && line.count>0);
+
+					if(cmp>=0){//If file is accessible
+						close(cmp);
+						printf("full path:[%s]\n",path);
+						return; //because we don't want to activate the fallback mechanism
+					}
+				}
 			}
-		}else{
-		strncpy(path+len, "index.html", PATH_LEN_MAX-len );
 		}
 		close(fd);
 	}
+
+	// If anything fails, fallback to index.html
+	strncpy(path+len, "index.html", PATH_LEN_MAX-len );
 	
 }
-*/
+
