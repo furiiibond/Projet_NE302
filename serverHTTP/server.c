@@ -35,11 +35,14 @@ int writeHeaders(unsigned int clientId, Header_List reponseHL);// DYNAMIC ALLOCA
 int main(/*int argc, char *argv[]*/)
 {
 	message *requete;
-	
+	HTML_Rep reponse;
+	Fichier file;
+	HeaderStruct headers; 
 	
 	FillHostsParametres(); //Setup des options (see option_parser.h)
 	load_gramm_rule(HTTP_RULES);// charge la grammaire HTTP
 	
+
 	/** DYNAMIC ALLOCATION
 	Declaration d'une Header List
 	 - Header initial */
@@ -54,7 +57,7 @@ int main(/*int argc, char *argv[]*/)
 	printf(CYN"#------------	Server Ready	------------#\n"NC);
 	
 	while ( 1 ) {
-		// on attend la reception d'une requete HTTP requete pointera vers une ressource allouée par librequest.
+		// on attend la reception d'une requete HTTP, requete pointera vers une ressource allouée par librequest.
 		if ((requete=getRequest(8080)) == NULL ) return -1;
 
 		// Affichage de debug
@@ -63,10 +66,6 @@ int main(/*int argc, char *argv[]*/)
 		printf(YEL"Contenu de la demande"NC"\n%.*s\n",requete->len,requete->buf);
 		
 		
-		
-		HTML_Rep reponse;
-		Fichier file;
-		HeaderStruct headers; 
 		reponseHL.next = NULL;// DYNAMIC ALLOCATION
 		
 		int method = RequestHandler(requete, &headers, &reponse, &reponseHL, &file);

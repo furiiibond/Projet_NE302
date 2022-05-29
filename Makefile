@@ -14,7 +14,7 @@ default: export main
 
 export:
 	@echo "Copier coller la ligne ci-dessous"
-	export LD_LIBRARY_PATH=LD_LIBRARY_PATH:$(LIBPARS):$(LIBREQ)
+	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(LIBPARS):$(LIBREQ)
 
 main:
 	cd $(SERVER) && \

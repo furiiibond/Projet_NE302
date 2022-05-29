@@ -34,17 +34,12 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 	
 	/* Sanitize Path */
 	int root_path = strlen(host_ptr->DocumentRoot);	
-	if(verif_path_sanity(file->path+root_path,len-root_path)!=OK){
+	if(verif_path_sanity(file->path+root_path,len-root_path)!=OK)
 		return ERR_403; // 403 Forbidden
-	}
 	
 	char last_char = *(file->path +len-1);
-	if (last_char == '/'){
-		get_default_page(file->path, len); //A implémenter
-		/*strncpy(file->path+len,
-				"index.html",
-				PATH_LEN_MAX-len );*/
-	}
+	if (last_char == '/')
+		get_default_page(file->path, len);
 	
 
 	int fichier;
@@ -238,8 +233,9 @@ void get_default_page(char* path,int len){
 				} while( line.count> 0 && cmp);    //While we haven't found the string
 				
 				if(cmp == 0){ //On a donc trouvé "DirectoryIndex"
+					// Iterate over every entries while we didn't found a valid file
 					do {
-						rule = sv_chop_by_delim(&line, ' ');//Chop every entry by whitespaces
+						rule = sv_chop_by_delim(&line, ' ');
 						strncpy(path+len, rule.data, PATH_LEN_MAX-rule.count );
 						path[len+rule.count]='\0';
 						cmp = open(path, O_RDWR);// test access
