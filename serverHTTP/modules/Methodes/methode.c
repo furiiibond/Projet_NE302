@@ -38,7 +38,7 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 	}
 	
 	file->length = st.st_size;	//Longueur du fichier
-	file->to_send = 1;
+	
 	close(fichier);
 	
 	

@@ -55,20 +55,24 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 			if(verif_path_sanity(file->path+root_path,len-root_path)!=OK)
 				status_code = ERR_403; // 403 Forbidden
 			
+			//Vérifier le status code
+			
 			char* last_char = (file->path +len-1);
 			if (*last_char == '/')
 				get_default_page(file->path, len);
 				
 			if(strcmp((last_char-3), ".php")){
-				
+				;
 			}
 		}		
 		
 		if (status_code == OK)
 		switch(method){
 			case GET:
-			case HEAD:
 			case POST:
+				file->to_send = 1;
+				/* fall through */
+			case HEAD:
 				status_code = traiter_GET(headers, reponse, reponseHL, file);
 			break;
 			case PUT:
