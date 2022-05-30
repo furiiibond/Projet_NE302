@@ -80,13 +80,16 @@ int main(/*int argc, char *argv[]*/)
 		writeDirectClient(requete->clientId, "\r\n", 2);
 		
 		//Action à faire en fonction de la methode
-		switch(method){
-			case GET:
+		if(file->to_send){
 				//Message Body (le fichier à transmettre)
 				send_file(requete->clientId, file);
 				printf("["BLU"Fichier"NC":"MAG"%s"NC"] %s\n\n",file.type,file.path);
-				break;
 		}
+		/**if(champ_php->to_send){
+			send php
+			printf
+			free ??
+		}*/
 		
 		endWriteDirectClient(requete->clientId);
 		

@@ -16,6 +16,7 @@ typedef struct {
 	char path[PATH_LEN_MAX];
 	char type[TYPE_LEN_MAX];
 	long length;
+	int to_send;
 } Fichier;
 
 typedef struct {
