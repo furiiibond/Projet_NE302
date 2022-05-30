@@ -173,17 +173,19 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	strncpy(tmp,headers->host.data,headers->host.count);
 	tmp[headers->host.count]='\0';
 	addNameValuePair(&header_param,"HTTP_HOST", tmp);
-	addNameValuePair(&header_param,"SERVER_SOFTWARE", "Apache/2.4.53 (Debian)");
-	addNameValuePair(&header_param,"SERVER_NAME", "localhost");
-	addNameValuePair(&header_param,"SERVER_ADDR", "localhost");
+	//addNameValuePair(&header_param,"SERVER_SOFTWARE", "Apache/2.4.53 (Debian)");
+	//addNameValuePair(&header_param,"SERVER_NAME", "localhost");
+	//addNameValuePair(&header_param,"SERVER_ADDR", "localhost");
 	addNameValuePair(&header_param,"SERVER_PORT", "8080");
-	addNameValuePair(&header_param,"REMOTE_ADDR", "localhost");
+	//addNameValuePair(&header_param,"REMOTE_ADDR", "localhost");
+	strcpy(tmp,pwd);
+	if(site_param->DocumentRoot[0] != '\0')strcat(tmp,"/");
+	strcat(tmp,site_param->DocumentRoot);
 	addNameValuePair(&header_param,"DOCUMENT_ROOT", site_param->DocumentRoot);
 	addNameValuePair(&header_param,"REQUEST_SCHEME", "http");
 	addNameValuePair(&header_param,"CONTEXT_DOCUMENT_ROOT", site_param->DocumentRoot);
 	strcpy(tmp,pwd);
 	if(site_param->DocumentRoot[0] != '\0')strcat(tmp,"/");
-	strcat(tmp,site_param->DocumentRoot);
 	addNameValuePair(&header_param,"CONTEXT_PREFIX", tmp);
 	addNameValuePair(&header_param,"SERVER_ADMIN", "root@localhost");
 	char scriptPrefix[] = "proxy:fcgi://127.0.0.1:9000/";   // TODO : change this
@@ -191,7 +193,7 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	strcpy(tmp,scriptPrefix);
 	strcat(tmp,pwd);
 	if(site_param->DocumentRoot[0] != '\0')strcat(tmp,"/");
-	strcat(tmp,site_param->DocumentRoot);
+	strcat(tmp,file->path);
 	addNameValuePair(&header_param,"SCRIPT_FILENAME", tmp);  //is it the right path ?
 	//addNameValuePair(&header_param,"REMOTE_PORT", "56842");  //TODO an other one Dj Khaled
 	addNameValuePair(&header_param,"GATEWAY_INTERFACE", "CGI/1.1");
@@ -201,7 +203,7 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	strncpy(tmp,headers->absolutePath.data,headers->absolutePath.count);
 	tmp[headers->absolutePath.count]='\0';
 	addNameValuePair(&header_param,"REQUEST_URI", tmp);
-	//addNameValuePair(&header_param,"SCRIPT_NAME", absolutePath); // TODO : check this
+	addNameValuePair(&header_param,"SCRIPT_NAME", file->path+file->last_slash); // TODO : check this
 
 	int fd;
 	fd=createSocket(9000);
@@ -218,7 +220,14 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	FCGI_Header h;
 	h.type=0;
 
+	Header_List *bak = PHP_data;
+	Header_List *ptr;
+	char* tab;
+
 	while(h.type != FCGI_END_REQUEST){
+
+			ptr = malloc (sizeof(Header_List));
+			tab = malloc (sizeof(char)*FASTCGILENGTH);
 
 			//Lit headers
 			read(fd,&h,FCGI_HEADER_SIZE);
@@ -234,17 +243,29 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 			int m=0;
 			int k;
 			while(m<n){
-				k= read(fd,&(h.contentData)+m,n-m);
+				k= read(fd,tab+m,n-m);
 				if(k==-1) {printf("break"); break;}
 				m+=k;
 				printf("%d ",m);
 			}
 			puts("");
-			printf("contentData:%.*s\n",10,h.contentData);
-	}
+			printf("contentData:%.*s\n",10,tab);
 
+			ptr->header.data = tab;
+			ptr->header.count = h.contentLength;
+
+			bak->next=ptr;
+			bak=ptr;
+
+	}
+	ptr->next=NULL;
 	close(fd);
 
+	ptr=PHP_data->next;
+	while(ptr){
+		printf("]%.20s\n",ptr->header.data);
+		ptr=ptr->next;
+	}
 
 return OK;
 }
