@@ -15,6 +15,7 @@
 #include "../Headers/header_parser.h"
 #include "../Semantique/semantique.h"
 #include "../Methodes/methode.h"
+#include "../PHP/socket_1.h"
 
 //parser api
 #include "api.h"
@@ -25,7 +26,7 @@ int verif_path_sanity(char *path,int len);
 void get_default_page(char* path, int len);
 
 
-int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseHL, Fichier* file){
+int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseHL, Fichier* file, Header_List* PHP_data){
 	int res,status_code;
 	int method;
 	file->to_send=0;
@@ -62,7 +63,7 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 				get_default_page(file->path, len);
 				
 			if(strcmp((last_char-3), ".php")){
-				;
+				executePHP(host_ptr, headers, file, reponse, PHP_data);
 			}
 		}		
 		

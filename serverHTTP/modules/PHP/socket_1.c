@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "socket_1.h"
 #include "fastcgi.h"
 
 // =========================================================================================================== //
@@ -59,6 +60,7 @@ int addNameValuePair(FCGI_Header *h,char *name,char *value)
 	if (value) strncpy(p,value,valueLen);
 	h->contentLength+=nameLen+((nameLen>0x7F)?4:1);
 	h->contentLength+=valueLen+((valueLen>0x7F)?4:1);
+	return 0;
 }
 // =========================================================================================================== //
 
@@ -157,11 +159,93 @@ static int createSocket(int port)
 
 
 // =========================================================================================================== //
-int main()
+int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file, HTML_Rep* reponse, Header_List* PHP_data)
+{
+	FCGI_Header header_param;
+	//convert headers->host from String_Value to char*
+	char* host = (char*)malloc(sizeof(char)*(headers->host.count+1));
+	strcpy(host,headers->host.data);
+	addNameValuePair(&header_param,"HTTP_HOST", host);
+	addNameValuePair(&header_param,"SERVER_SOFTWARE", "Apache/2.4.53 (Debian)");
+	addNameValuePair(&header_param,"SERVER_NAME", "localhost");
+	addNameValuePair(&header_param,"SERVER_ADDR", "localhost");
+	addNameValuePair(&header_param,"SERVER_PORT", "80");
+	addNameValuePair(&header_param,"REMOTE_ADDR", "localhost");
+	addNameValuePair(&header_param,"DOCUMENT_ROOT", site_param->DocumentRoot);
+	addNameValuePair(&header_param,"REQUEST_SCHEME", "http");
+	addNameValuePair(&header_param,"CONTEXT_DOCUMENT_ROOT", site_param->DocumentRoot);
+	addNameValuePair(&header_param,"CONTEXT_PREFIX", "");
+	addNameValuePair(&header_param,"SERVER_ADMIN", "root@localhost");
+	char* scriptFileName = "proxy:fcgi://127.0.0.1:9000/";   // TODO : change this
+	//concatenate the scriptFileName with the DocumentRoot and the file->path
+	char* scriptPath = (char*)malloc(sizeof(char)*(strlen(site_param->DocumentRoot)+strlen(file->path)+1));
+	strcpy(scriptPath,site_param->DocumentRoot);
+	strcat(scriptPath,file->path);
+	strcat(scriptFileName,scriptPath);
+	addNameValuePair(&header_param,"SCRIPT_FILENAME", scriptFileName);  //is it the right path ?
+	addNameValuePair(&header_param,"REMOTE_PORT", "56842");  //TODO an other one Dj Khaled
+	addNameValuePair(&header_param,"GATEWAY_INTERFACE", "CGI/1.1");
+	addNameValuePair(&header_param,"SERVER_PROTOCOL", "HTTP/1.1");
+	addNameValuePair(&header_param,"REQUEST_METHOD", "GET");
+	addNameValuePair(&header_param,"QUERY_STRING", "");
+	//convert headers->absolutePath from String_Value to char*
+	char* absolutePath = (char*)malloc(sizeof(char)*(headers->absolutePath.count+1));
+	strcpy(absolutePath,headers->absolutePath.data);
+	addNameValuePair(&header_param,"REQUEST_URI", absolutePath);
+	addNameValuePair(&header_param,"SCRIPT_NAME", absolutePath); // TODO : check this
+
+	int fd;
+	fd=createSocket(9000);
+
+	sendBeginRequest(fd,10,FCGI_RESPONDER,FCGI_KEEP_CONN);
+	writeSocket(fd, &header_param, FCGI_HEADER_SIZE + header_param.contentLength + header_param.paddingLength);
+	sendParam(fd,10,NULL,0);
+	sendStdin(fd,10,NULL,0);
+
+
+	/*
+	*	Header of
+	*/
+	FCGI_Header h;
+	h.type=0;
+
+	while(h.type != FCGI_END_REQUEST){
+
+			//Lit headers
+			read(fd,&h,FCGI_HEADER_SIZE);
+			//Conversition Little Endian
+			h.requestId = htons(h.requestId);
+			h.contentLength = htons(h.contentLength);
+			printf("version:%d\n",h.version);
+			printf("type:%d\n",h.type);
+			printf("requestID:%d\n",h.requestId);
+			printf("contentLength:%d\n",h.contentLength);
+			printf("paddingLength:%d\n",h.paddingLength);
+			int n=h.contentLength+h.paddingLength;
+			int m=0;
+			int k;
+			while(m<n){
+				k= read(fd,&(h.contentData)+m,n-m);
+				if(k==-1) {printf("break"); break;}
+				m+=k;
+				printf("%d ",m);
+			}
+			puts("");
+			printf("contentData:%.*s\n",10,h.contentData);
+	}
+
+	close(fd);
+
+
+
+}
+
+
+/**
+ExecutePHP(struct Options* site_param, Fichier* file, HTML_Rep* reponse, Header_List* liste)
 {
 	int fd;
 	fd=createSocket(9000);
-	//sendGetValue(fd);
 
 char param1[]=
 "\x11\x01\x70\x72\x6f\x78\x79\x2d\x6e\x6f\x6b\x65\x65\x70\x61\x6c" \
@@ -274,4 +358,8 @@ close(fd);
 
 
 
-}
+}*/
+
+
+
+

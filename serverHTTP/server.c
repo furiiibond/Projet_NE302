@@ -67,8 +67,9 @@ int main(/*int argc, char *argv[]*/)
 		
 		
 		reponseHL.next = NULL;// DYNAMIC ALLOCATION
+		Header_List PHP_data;
 		
-		int method = RequestHandler(requete, &headers, &reponse, &reponseHL, &file);
+		int method = RequestHandler(requete, &headers, &reponse, &reponseHL, &file, &PHP_data);
 		
 		//HEADER response
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
