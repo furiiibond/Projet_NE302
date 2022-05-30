@@ -131,7 +131,7 @@ static int createSocket(int port)
 {
 	int fd;
 	struct sockaddr_in serv_addr;
-	int enable = 1;
+	//int enable = 1; //Commenté par nous pour enlever le warning
 
 	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		perror("socket creation failed\n");
@@ -359,7 +359,3 @@ close(fd);
 
 
 }*/
-
-
-
-
