@@ -24,24 +24,27 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 	//vérifie qu'on peut ouvrir le fichier
 	if ((fichier = open(file->path, O_RDWR)) == -1) {
 		printf(RED"ERROR"NC" file unreachable\n");
-		return ERR_404; //File not found    
+		file->to_send = 0;
+		return ERR_404; //File not found
 	}
-	
+
 	//Met le MIME type du fichier dans file->type
-	if (get_mime_type(file) == -1)
+	if (get_mime_type(file) == -1){
+		close(fichier);
 		return ERR_500; //Internal server error
-    
+	}
+
 	struct stat st;
     if (fstat(fichier, &st) == -1){
 		close(fichier);
 		return ERR_500; //Internal server error
 	}
-	
+
 	file->length = st.st_size;	//Longueur du fichier
-	
+
 	close(fichier);
-	
-	
+
+
 	/* On rempli la réponse */
 	//HTTP Version
 	reponse->len = snprintf(reponse->content, HEADER_LEN_MAX, SERV_VERSION(headers->httpVersion) );
@@ -54,7 +57,7 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 		reponse->len += snprintf(reponse->content+reponse->len,
 		HEADER_LEN_MAX-reponse->len,
 		"Connection: close\r\n");
-	
+
 	/** DYNAMIC ALLOCATION --------------------- */
 	//Fonction pour remplir la header list
 	set_VerAndStatus(reponseHL,headers);
@@ -62,9 +65,9 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 	/*
 	add_ContentLength(reponseHL,headers,File);
 	add_Connection(reponseHL,headers);
-	*/	
+	*/
 	/** ---------------------------------------- */
-	
+
 	return OK;
 }
 
@@ -81,7 +84,7 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 //	-	"%s",buffer[TYPE_LEN_MAX] -> y char
 //	-	"\r\n"			 -> 2 char
 //  TYPE_LEN_MAX = 64
-//	MAX = 14 + 64 + 2 (supérieur à 16+y) 
+//	MAX = 14 + 64 + 2 (supérieur à 16+y)
 
 Header_List* set_VerAndStatus( Header_List* reponseHL, HeaderStruct* headers){
 	reponseHL->header.data[7] = '0' + (headers->httpVersion >= 11);
@@ -103,9 +106,3 @@ Header_List* add_ContentType( Header_List* reponseHL, Fichier* file){
 			file->type);
 	return ptr;
 }
-
-
-
-
-
-

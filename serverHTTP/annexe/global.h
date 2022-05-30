@@ -16,6 +16,8 @@ typedef struct {
 	char path[PATH_LEN_MAX];
 	char type[TYPE_LEN_MAX];
 	long length;
+	int middle;
+	int last_slash;
 	int to_send;
 } Fichier;
 
@@ -58,8 +60,8 @@ typedef struct {
 struct Options {
 	char ServerName[HOST_LEN_MAX];
 	char DocumentRoot[PATH_LEN_MAX];
-	
-	
+
+
 	struct Options* next;
 };
 extern struct Options* HostsParametres;

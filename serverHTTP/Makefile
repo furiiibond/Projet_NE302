@@ -12,7 +12,7 @@ MOD_OBJ=$(MODULES)/objs/
 #objs/
 
 CC=gcc
-FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api
+FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api -Wno-unused-parameter
 
 EXEC = server
 
@@ -28,7 +28,7 @@ run: notre
 export:
 	@echo "Copier coller la ligne ci-dessous"
 	export LD_LIBRARY_PATH=LD_LIBRARY_PATH:$(LIBPARS):$(LIBREQ)
-	
+
 #-----------------------------------------------------------------------------------------#
 ## Compilation de notre projet
 notre: dir $(OBJS) modules link
@@ -64,4 +64,3 @@ clean:
 
 
 .PHONY: export all notre clean modules
-

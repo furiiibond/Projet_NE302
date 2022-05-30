@@ -18,7 +18,7 @@ void writeSocket(int fd,FCGI_Header *h,unsigned int len)
 	int w;
 
 	h->contentLength=htons(h->contentLength);
-	h->paddingLength=htons(h->paddingLength);
+	//h->paddingLength=htons(h->paddingLength);
 
 
 	while (len) {
@@ -49,7 +49,7 @@ int addNameValuePair(FCGI_Header *h,char *name,char *value)
 	if (name) nameLen=strlen(name);
 	if (value) valueLen=strlen(value);
 
-	if ((valueLen > FASTCGIMAXNVPAIR) || (valueLen > FASTCGIMAXNVPAIR) ) return -1;
+	if ((nameLen > FASTCGIMAXNVPAIR) || (valueLen > FASTCGIMAXNVPAIR) ) return -1;
 	if ((h->contentLength+((nameLen>0x7F)?4:1)+((valueLen>0x7F)?4:1)) > FASTCGILENGTH ) return -1;
 
 	p=(h->contentData)+h->contentLength;
@@ -162,37 +162,46 @@ static int createSocket(int port)
 int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file, HTML_Rep* reponse, Header_List* PHP_data)
 {
 	FCGI_Header header_param;
+	header_param.version=FCGI_VERSION_1;
+	header_param.type=FCGI_PARAMS;
+	header_param.requestId=htons(10);
 	//convert headers->host from String_Value to char*
-	char* host = (char*)malloc(sizeof(char)*(headers->host.count+1));
-	strcpy(host,headers->host.data);
-	addNameValuePair(&header_param,"HTTP_HOST", host);
+	char tmp[FASTCGIMAXNVPAIR];
+	char pwd[FASTCGIMAXNVPAIR];
+	getcwd(pwd, FASTCGIMAXNVPAIR);
+
+	strncpy(tmp,headers->host.data,headers->host.count);
+	tmp[headers->host.count]='\0';
+	addNameValuePair(&header_param,"HTTP_HOST", tmp);
 	addNameValuePair(&header_param,"SERVER_SOFTWARE", "Apache/2.4.53 (Debian)");
 	addNameValuePair(&header_param,"SERVER_NAME", "localhost");
 	addNameValuePair(&header_param,"SERVER_ADDR", "localhost");
-	addNameValuePair(&header_param,"SERVER_PORT", "80");
+	addNameValuePair(&header_param,"SERVER_PORT", "8080");
 	addNameValuePair(&header_param,"REMOTE_ADDR", "localhost");
 	addNameValuePair(&header_param,"DOCUMENT_ROOT", site_param->DocumentRoot);
 	addNameValuePair(&header_param,"REQUEST_SCHEME", "http");
 	addNameValuePair(&header_param,"CONTEXT_DOCUMENT_ROOT", site_param->DocumentRoot);
-	addNameValuePair(&header_param,"CONTEXT_PREFIX", "");
+	strcpy(tmp,pwd);
+	if(site_param->DocumentRoot[0] != '\0')strcat(tmp,"/");
+	strcat(tmp,site_param->DocumentRoot);
+	addNameValuePair(&header_param,"CONTEXT_PREFIX", tmp);
 	addNameValuePair(&header_param,"SERVER_ADMIN", "root@localhost");
-	char* scriptFileName = "proxy:fcgi://127.0.0.1:9000/";   // TODO : change this
+	char scriptPrefix[] = "proxy:fcgi://127.0.0.1:9000/";   // TODO : change this
 	//concatenate the scriptFileName with the DocumentRoot and the file->path
-	char* scriptPath = (char*)malloc(sizeof(char)*(strlen(site_param->DocumentRoot)+strlen(file->path)+1));
-	strcpy(scriptPath,site_param->DocumentRoot);
-	strcat(scriptPath,file->path);
-	strcat(scriptFileName,scriptPath);
-	addNameValuePair(&header_param,"SCRIPT_FILENAME", scriptFileName);  //is it the right path ?
-	addNameValuePair(&header_param,"REMOTE_PORT", "56842");  //TODO an other one Dj Khaled
+	strcpy(tmp,scriptPrefix);
+	strcat(tmp,pwd);
+	if(site_param->DocumentRoot[0] != '\0')strcat(tmp,"/");
+	strcat(tmp,site_param->DocumentRoot);
+	addNameValuePair(&header_param,"SCRIPT_FILENAME", tmp);  //is it the right path ?
+	//addNameValuePair(&header_param,"REMOTE_PORT", "56842");  //TODO an other one Dj Khaled
 	addNameValuePair(&header_param,"GATEWAY_INTERFACE", "CGI/1.1");
 	addNameValuePair(&header_param,"SERVER_PROTOCOL", "HTTP/1.1");
 	addNameValuePair(&header_param,"REQUEST_METHOD", "GET");
-	addNameValuePair(&header_param,"QUERY_STRING", "");
-	//convert headers->absolutePath from String_Value to char*
-	char* absolutePath = (char*)malloc(sizeof(char)*(headers->absolutePath.count+1));
-	strcpy(absolutePath,headers->absolutePath.data);
-	addNameValuePair(&header_param,"REQUEST_URI", absolutePath);
-	addNameValuePair(&header_param,"SCRIPT_NAME", absolutePath); // TODO : check this
+	//addNameValuePair(&header_param,"QUERY_STRING", "");
+	strncpy(tmp,headers->absolutePath.data,headers->absolutePath.count);
+	tmp[headers->absolutePath.count]='\0';
+	addNameValuePair(&header_param,"REQUEST_URI", tmp);
+	//addNameValuePair(&header_param,"SCRIPT_NAME", absolutePath); // TODO : check this
 
 	int fd;
 	fd=createSocket(9000);
@@ -237,7 +246,7 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	close(fd);
 
 
-
+return OK;
 }
 
 

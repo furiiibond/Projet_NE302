@@ -21,10 +21,7 @@
 #include "api.h"
 
 struct Options* get_host_ptr(HeaderStruct* headers);
-int cat_n_with_percent_encoding(char* path, const char* data,int count);
-int verif_path_sanity(char *path,int len);
-void get_default_page(char* path, int len);
-
+int traiter_URI(Fichier* file, HeaderStruct* headers, struct Options* host_ptr);
 
 int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseHL, Fichier* file, Header_List* PHP_data){
 	int res,status_code;
@@ -32,6 +29,7 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 	file->to_send=0;
 	if ((res=parseur(requete->buf,requete->len))) {
 		_Token *root;
+		struct Options* host_ptr;
 		printf(GRN "Requete parsée\n" NC);
 
 		root=getRootTree();
@@ -43,30 +41,17 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 
 		/* ----------------------------------------- */
 		if (status_code == OK){
-			struct Options* host_ptr;
 			host_ptr = get_host_ptr(headers);
-			int len;
 
-			//Concaténation du path du dossier avec le absolute-path du fichier
-			strcpy(file->path,host_ptr->DocumentRoot);
-			len = cat_n_with_percent_encoding(file->path, headers->absolutePath.data, headers->absolutePath.count);
-			file->path[len] = '\0';//Ajout de la sentinelle
+			status_code = traiter_URI(file,headers,host_ptr);
+		}
 
-			/* Sanitize Path */
-			int root_path = strlen(host_ptr->DocumentRoot);
-			if(verif_path_sanity(file->path+root_path,len-root_path)!=OK)
-				status_code = ERR_403; // 403 Forbidden
-
-			//Vérifier le status code
-
-			char* last_char = (file->path +len-1);
-			if (*last_char == '/')
-				get_default_page(file->path, len);
-
-			if(!strcmp((last_char-3), ".php")){
+		printf("Extention: %s\n",file->path+file->length-3);
+		if (status_code == OK)
+			if(!strcmp(file->path+file->length-4, ".php")){
+				printf(BLU"Request PHP script execution"NC"\n");
 				executePHP(host_ptr, headers, file, reponse, PHP_data);
 			}
-		}
 
 		/* ----------------------------------------- */
 		if (status_code == OK)
@@ -98,6 +83,7 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 	}
 
 	if(status_code < 0){
+		file->to_send = 0;// Out of place mais plus facile
 		ErrorHandler(reponse, headers, /*file,*/ status_code);
 		method=status_code;
 	}
@@ -112,6 +98,39 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 
 
 /* ------------ Annexe ------------ */ // <-- Nécessite son propre fichier surement
+
+int cat_n_with_percent_encoding(char* path, const char* data,int count);
+int verif_path_sanity(char *path,int len);
+int get_default_page(char* path, int len);
+
+
+int traiter_URI(Fichier* file, HeaderStruct* headers, struct Options* host_ptr){
+	//Concaténation du path du dossier avec le absolute-path du fichier
+	strcpy(file->path,host_ptr->DocumentRoot);
+	file->middle = strlen(host_ptr->DocumentRoot);
+
+	int len = cat_n_with_percent_encoding(file->path, headers->absolutePath.data, headers->absolutePath.count);
+	file->path[len] = '\0';//Ajout de la sentinelle
+
+	/* Sanitize Path */
+	int root_path = strlen(host_ptr->DocumentRoot);
+	if(verif_path_sanity(file->path+root_path,len-root_path)!=OK)
+		return ERR_403; // 403 Forbidden
+
+	char* last_char = (file->path +len-1);
+	if (*last_char == '/')
+		len = get_default_page(file->path, len);
+
+	file->path[len]='\0';
+	file->length=len;
+	printf("full path: %s\n",file->path);
+	file->last_slash = strrchr(file->path, '/') - file->path;
+
+	return OK;
+}
+
+
+
 
 /* Gestion du multi-site
 	renvoie un pointeur vers la structure d'option
@@ -195,7 +214,7 @@ int cat_n_with_percent_encoding(char* path, const char* data,int count){
 
 
 //Retour
-void get_default_page(char* path,int len){
+int get_default_page(char* path,int len){
 	int fd;
 	char ht_path[PATH_LEN_MAX];
 	strcpy(ht_path,path);
@@ -228,9 +247,10 @@ void get_default_page(char* path,int len){
 					}while( cmp <0 && line.count>0);
 
 					if(cmp>=0){//If file is accessible
+						close(fd);
 						close(cmp);
 						printf("full path:[%s]\n",path);
-						return; //because we don't want to activate the fallback mechanism
+						return len+rule.count; //because we don't want to activate the fallback mechanism
 					}
 				}
 			}
@@ -240,5 +260,5 @@ void get_default_page(char* path,int len){
 
 	// If anything fails, fallback to index.html
 	strncpy(path+len, "index.html", PATH_LEN_MAX-len );
-
+	return len+11;
 }
