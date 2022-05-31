@@ -129,6 +129,10 @@ int traiter_URI(Fichier* file, HeaderStruct* headers, struct Options* host_ptr){
 	printf("full path: %s\n",file->path);
 	file->last_slash = strrchr(file->path, '/') - file->path;
 
+
+	//if(is_illegal(file))
+	//	return ERR_451;
+
 	return OK;
 }
 

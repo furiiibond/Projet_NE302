@@ -68,7 +68,12 @@ struct Options {
 	char ServerName[HOST_LEN_MAX];
 	char DocumentRoot[PATH_LEN_MAX];
 
+	/* ======== PHP ======== */
 	char PHPHandler[100];
+	char PHPDir[100];
+
+	/* ====== Illegal ====== */
+	char IllegalFiles[1000];
 
 	struct Options* next;
 };

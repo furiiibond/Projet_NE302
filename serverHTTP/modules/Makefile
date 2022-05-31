@@ -5,7 +5,7 @@ LIBREQ = ../../librequest-0.5
 MODULES = OptionsParser RequestHandler Methodes ErrorHandler Headers Semantique PHP
 OBJ_PATH=objs/
 
-FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api -Wno-unused-parameter
+FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api #-Wno-unused-parameter
 
 objs: dir
 	for moduleName in $(MODULES) ; do \

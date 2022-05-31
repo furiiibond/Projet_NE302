@@ -12,7 +12,7 @@ MOD_OBJ=$(MODULES)/objs/
 #objs/
 
 CC=gcc
-FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api -Wno-unused-parameter
+FLAGS=-Wall -Wextra -g -I $(LIBPARS) -I $(LIBREQ)/api #-Wno-unused-parameter
 
 EXEC = server
 

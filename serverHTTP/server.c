@@ -69,13 +69,13 @@ int main(/*int argc, char *argv[]*/)
 
 		reponseHL.next = NULL;// DYNAMIC ALLOCATION
 
-		int method = RequestHandler(requete, &headers, &reponse, &reponseHL, &file, &PHP_data);
+		RequestHandler(requete, &headers, &reponse, &reponseHL, &file, &PHP_data);
 
 		//HEADER response
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
 		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len,reponse.content);
 
-		//writeHeaders(requete->clientId, reponseHL);// DYNAMIC ALLOCATION
+	  //writeHeaders(requete->clientId, reponseHL);// DYNAMIC ALLOCATION
 
 
 		//Action à faire en fonction de la methode
@@ -107,13 +107,13 @@ int main(/*int argc, char *argv[]*/)
 
 /** DYNAMIC ALLOCATION */
 int writeHeaders(unsigned int clientId, Header_List reponseHL){
-	//writeDirectClient(clientId, reponseHL.header.data, reponseHL.header.count);
+	writeDirectClient(clientId, reponseHL.header.data, reponseHL.header.count);
 	printf(MAG "DEBUG: %.*s", (int) reponseHL.header.count, reponseHL.header.data);
 	Header_List *ptr;
 	ptr = reponseHL.next;
 	Header_List *ptr2;
 	while(ptr){
-		//writeDirectClient(clientId, ptr->header.data, ptr->header.count);
+		writeDirectClient(clientId, ptr->header.data, ptr->header.count);
 		printf("%.*s", (int) ptr->header.count, ptr->header.data);
 		ptr2 = ptr->next;
 		free(ptr->header.data);
@@ -122,7 +122,7 @@ int writeHeaders(unsigned int clientId, Header_List reponseHL){
 	}
 	printf(NC "\n++++\n");
   //Termine la partie header avec un deuxième CRLF
-  //writeDirectClient(requete->clientId, "\r\n", 2);
+  writeDirectClient(clientId, "\r\n", 2);
 	return 0;
 }
 
