@@ -6,7 +6,7 @@
 */
 
 
-/* 
+/*
 	Va lire le Fichier SERV_CONFIG (défini dans param.h)
 	Puis le parser à l'aide des règles CONF_RULES (définies dans param.h)
 	Enfin remplis la liste chainée avec les informations acquérie.
@@ -14,7 +14,7 @@
 */
 int FillHostsParametres(void);
 
-
+void FreeHostsParametres(void);
 
 
 

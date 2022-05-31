@@ -50,6 +50,7 @@ int FillHostsParametres(void){
 	_Token* t; int l; //char *s;
 	t = searchTree( NULL, "Config");
 	/*s = */getElementValue(t->node, &l);
+  purgeElement(&t);
 	if (l < st.st_size){
 		printf(MAG"Warning: Possible Entry Miss"NC" - Check your "SERV_CONFIG" file\n");
 		// printf("File size: %ld\t -  Config len: %d\n",st.st_size,l);
@@ -121,13 +122,24 @@ int FillHostsParametres(void){
 
 		tok = tok->next;
     }
-
+  hostparlist->next = NULL;
 	purgeElement(&Entry_list);
-	purgeTree(NULL);
-    close(fd);
+	purgeTree(getRootTree());
+  close(fd);
 	close_gramm_rule();
 
 	printf(GRN"DONE PARSING OPTIONS\n"NC);
 
 	return 0;
+}
+
+
+
+void FreeHostsParametres(void){
+  struct Options *bak, *ptr= HostsParametres;
+  while(ptr){
+    bak=ptr;
+    ptr=ptr->next;
+    free(bak);
+  }
 }

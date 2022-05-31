@@ -18,7 +18,8 @@ void writeSocket(int fd,FCGI_Header *h,unsigned int len)
 	int w;
 
 	h->contentLength=htons(h->contentLength);
-	//h->paddingLength=htons(h->paddingLength);
+	h->requestId=htons(h->requestId);
+	h->reserved=0;
 
 
 	while (len) {
@@ -70,7 +71,7 @@ FCGI_Header h;
 
 	h.version=FCGI_VERSION_1;
 	h.type=FCGI_GET_VALUES;
-	h.requestId=htons(FCGI_NULL_REQUEST_ID);
+	h.requestId=FCGI_NULL_REQUEST_ID;
 	h.contentLength=0;
 	h.paddingLength=0;
 	addNameValuePair(&h,FCGI_MAX_CONNS,NULL);
@@ -81,12 +82,12 @@ FCGI_Header h;
 // =========================================================================================================== //
 void sendBeginRequest(int fd,unsigned short requestId,unsigned short role,unsigned char flags)
 {
-FCGI_Header h;
+FCGI_Header h={0};
 FCGI_BeginRequestBody *begin;
 
 	h.version=FCGI_VERSION_1;
 	h.type=FCGI_BEGIN_REQUEST;
-	h.requestId=htons(requestId);
+	h.requestId=requestId;
 	h.contentLength=sizeof(FCGI_BeginRequestBody);
 	h.paddingLength=0;
 	begin=(FCGI_BeginRequestBody *)&(h.contentData);
@@ -100,7 +101,7 @@ void sendAbortRequest(int fd,unsigned short requestId)
 FCGI_Header h;
 
 	h.version=FCGI_VERSION_1;
-	h.type=htons(FCGI_ABORT_REQUEST);
+	h.type=FCGI_ABORT_REQUEST;
 	h.requestId=requestId;
 	h.contentLength=0;
 	h.paddingLength=0;
@@ -119,7 +120,7 @@ FCGI_Header h;
 
 	h.version=FCGI_VERSION_1;
 	h.type=type;
-	h.requestId=htons(requestId);
+	h.requestId=requestId;
 	h.contentLength=len;
 	h.paddingLength=0;
 	memcpy(h.contentData,data,len);
@@ -164,7 +165,7 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	FCGI_Header header_param;
 	header_param.version=FCGI_VERSION_1;
 	header_param.type=FCGI_PARAMS;
-	header_param.requestId=htons(10);
+	header_param.requestId=10;
 	header_param.contentLength=0;
 	header_param.paddingLength=0;
 	//convert headers->host from String_Value to char*
@@ -271,10 +272,10 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 			//Conversition Little Endian
 			h.requestId = htons(h.requestId);
 			h.contentLength = htons(h.contentLength);
-			printf("version:%d\n",h.version);
-			printf("type:%d\n",h.type);
-			printf("requestID:%d\n",h.requestId);
-			printf("contentLength:%d\n",h.contentLength);
+			printf("version:%d ",h.version);
+			printf("type:%d ",h.type);
+			printf("requestID:%d ",h.requestId);
+			printf("contentLength:%d ",h.contentLength);
 			printf("paddingLength:%d\n",h.paddingLength);
 
 			int n=h.contentLength+h.paddingLength;
@@ -293,7 +294,7 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 					printf("%d ",m);
 				}
 				puts("");
-				printf("contentData:%.*s\n",10,tab);
+				printf("]contentData:%.*s\n",10,tab);
 
 				ptr->header.data = tab;
 				ptr->header.count = h.contentLength;
@@ -306,8 +307,8 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 					if(k==-1) {printf("break"); break;}
 					m+=k;
 				}
-				h.contentData[n]='\0';
-				printf("DEBUG:%s",h.contentData);
+				//h.contentData[n]='\0';
+				//printf("DEBUG:%s",h.contentData);
 			}
 
 
@@ -319,7 +320,7 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	int count_flag = 0;
 	ptr=PHP_data->next;
 	while(ptr){
-		printf("]"SV_Fmt"\n",SV_Arg(ptr->header));
+		//printf("]"SV_Fmt"\n",SV_Arg(ptr->header));
 		//Compte le Content-length
 		if (count_flag == 0){
 			for(size_t i=0; i<ptr->header.count; i++){
@@ -335,7 +336,7 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 
 		ptr=ptr->next;
 	}
-	printf("Content-length:%d",count);
+	//printf("Content-length:%d\n",count);
 
 
 	//Construction de la réponse
@@ -348,7 +349,7 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 		HEADER_LEN_MAX-reponse->len,
 		"Connection: close\r\n");
 
-
+file->to_send=0;
 
 return OK;
 }

@@ -38,7 +38,7 @@ int main(/*int argc, char *argv[]*/)
 	HTML_Rep reponse;
 	Fichier file;
 	HeaderStruct headers;
-  Header_List PHP_data;
+  Header_List PHP_data={0};
 
 	FillHostsParametres(); //Setup des options (see option_parser.h)
 	load_gramm_rule(HTTP_RULES);// charge la grammaire HTTP
@@ -57,7 +57,7 @@ int main(/*int argc, char *argv[]*/)
 
 	printf(CYN"#------------	Server Ready	------------#\n"NC);
 
-	while ( 1 ) {
+	 while( 1 ) {
 		// on attend la reception d'une requete HTTP, requete pointera vers une ressource allouée par librequest.
 		if ((requete=getRequest(8080)) == NULL ) return -1;
 
@@ -102,6 +102,7 @@ int main(/*int argc, char *argv[]*/)
 	}
 	printf("exit\n");
 	close_gramm_rule();
+  FreeHostsParametres();
 	return (1);
 }
 
@@ -160,7 +161,7 @@ int writePHP(unsigned int clientId, Header_List *PHP_data){
 	Header_List *ptr2;
 	while(ptr){
 		writeDirectClient(clientId, ptr->header.data, ptr->header.count);
-		printf(SV_Fmt, SV_Arg(ptr->header));
+		//printf(SV_Fmt, SV_Arg(ptr->header));
 		ptr2 = ptr->next;
 		free(ptr->header.data);
 		free(ptr);

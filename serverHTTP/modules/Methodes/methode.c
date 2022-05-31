@@ -63,8 +63,8 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 
 	/** DYNAMIC ALLOCATION --------------------- */
 	//Fonction pour remplir la header list
-	set_VerAndStatus(reponseHL,headers);
-	add_ContentType(reponseHL,file);
+	//set_VerAndStatus(reponseHL,headers);
+	//add_ContentType(reponseHL,file);
 	/*
 	add_ContentLength(reponseHL,headers,File);
 	add_Connection(reponseHL,headers);

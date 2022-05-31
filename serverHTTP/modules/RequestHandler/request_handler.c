@@ -51,7 +51,7 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 
 		/* ----------------------------------------- */
 		if (status_code == OK){
-			printf("Extention: %s\n",file->path+file->length-3);
+			printf("Extention: %s\n",file->path+file->length-4);
 			if(!strcmp(file->path+file->length-4, ".php")){
 				printf(BLU"Request PHP script execution"NC"\n");
 				status_code = executePHP(host_ptr, headers, file, reponse, PHP_data);
