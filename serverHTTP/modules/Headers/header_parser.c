@@ -12,19 +12,39 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	_Token *req,*t,*ptr;
 	int l;
 	char *s;
-		
+
 	// Initialisation des headers optionels:
+	memset(headers, 0, sizeof(HeaderStruct));
+	/*
 	headers->host.count = 0;
 	headers->connection.keepAlive=0;
 	headers->connection.close=0;
-	
+	headers->query.data=NULL;
+	headers->msg_body.data=NULL;
+	headers->msg_body.count=0;
+	headers->referer.data=NULL;
+	headers->referer.count=0;
+	headers->contentType.data=NULL;
+	headers->contentType.count=0;
+	headers->contentLength.data=NULL;
+	headers->contentLength.count=0;*/
+
 	// Request Target [Obligatoire]
 	req = searchTree(root, "request-line");
 	t = searchTree(req->node, "absolute-path");
 	headers->absolutePath.data = getElementValue(t->node, &l);
 	headers->absolutePath.count = l;
 	purgeElement(&t);
-	
+
+	// Query [Optionel]
+	t = searchTree(req->node, "query");
+	if(t){
+		headers->query.data = getElementValue(t->node, &l);
+		headers->query.count = l;
+	}
+	purgeElement(&t);
+
+
 	// HTTP-version [Obligatoire]
 	t = searchTree(req->node, "HTTP-version");
 	s = getElementValue(t->node, &l);
@@ -35,14 +55,14 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	sscanf(tmp,"HTTP/%1d.%1d",&a,&b);
 	headers->httpVersion=10*a+b;
 	purgeElement(&t);
-	
+
 	// Method [Obligatoire]
 	t = searchTree(req->node, "method");
 	s = getElementValue(t->node, &l);
 	meth_trouve(headers, s, l);
 	purgeElement(&t);
 	purgeElement(&req);
-	
+
 	//Host-header [Optionnel]
 	req = searchTree(root, "Host-header");
 	if (req){
@@ -64,14 +84,14 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 				headers->connection.keepAlive=1;
 			else if(!strncasecmp(s,"close",5))
 				headers->connection.close=1;
-			else 
+			else
 				printf(RED"Unsuported connection-opiton: "NC"%.*s\n",l,s);
 			ptr =ptr->next;
 		}
 		purgeElement(&t);
 	}
 	purgeElement(&req);
-	
+
 	//Accept [Optionnel]
 	req = searchTree(root, "Accept-header");
 	if (req){
@@ -86,10 +106,43 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 		purgeElement(&t);
 	}
 	purgeElement(&req);
-	
-	
-		
-	/* DEBBUG */	
+
+	// Message Body [Optionel]
+	req = searchTree(root, "message-body");
+	if (req){
+		headers->msg_body.data = getElementValue(req->node, &l);
+		headers->msg_body.count = l-1;
+	}
+	purgeElement(&req);
+
+	// Content Type [Optionel]
+	req = searchTree(root, "Content-Type");
+	if (req){
+		headers->contentType.data = getElementValue(req->node, &l);
+		headers->contentType.count = l;
+	}
+	purgeElement(&req);
+
+	// Content Length [Optionel]
+	req = searchTree(root, "Content-Length");
+	if (req){
+		headers->contentLength.data = getElementValue(req->node, &l);
+		headers->contentLength.count = l;
+		//headers->msg_body.count = sscanf(); //Juste au cas où
+	}
+	purgeElement(&req);
+
+	// Referer [Optionel]
+	req = searchTree(root, "Referer");
+	if (req){
+		headers->referer.data = getElementValue(req->node, &l);
+		headers->referer.count = l;
+	}
+	purgeElement(&req);
+
+
+
+	/* DEBBUG */
 	printf("httpVersion = %d.%d\n",headers->httpVersion/10,headers->httpVersion%10);
 	printf("Host:" SV_Fmt "\n", SV_Arg(headers->host));
 	return OK;

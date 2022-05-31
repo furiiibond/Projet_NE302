@@ -27,7 +27,7 @@
 
 int send_file(unsigned int clientId, Fichier file);
 int writeHeaders(unsigned int clientId, Header_List reponseHL);// DYNAMIC ALLOCATION
-
+int writePHP(unsigned int clientId, Header_List *PHP_data);
 
 /**
  * MAIN !!
@@ -38,6 +38,7 @@ int main(/*int argc, char *argv[]*/)
 	HTML_Rep reponse;
 	Fichier file;
 	HeaderStruct headers;
+  Header_List PHP_data;
 
 	FillHostsParametres(); //Setup des options (see option_parser.h)
 	load_gramm_rule(HTTP_RULES);// charge la grammaire HTTP
@@ -67,7 +68,6 @@ int main(/*int argc, char *argv[]*/)
 
 
 		reponseHL.next = NULL;// DYNAMIC ALLOCATION
-		Header_List PHP_data;
 
 		int method = RequestHandler(requete, &headers, &reponse, &reponseHL, &file, &PHP_data);
 
@@ -75,10 +75,8 @@ int main(/*int argc, char *argv[]*/)
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
 		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len,reponse.content);
 
-		writeHeaders(requete->clientId, reponseHL);// DYNAMIC ALLOCATION
+		//writeHeaders(requete->clientId, reponseHL);// DYNAMIC ALLOCATION
 
-		//Termine la partie header avec un deuxième CRLF
-		writeDirectClient(requete->clientId, "\r\n", 2);
 
 		//Action à faire en fonction de la methode
 		if(file.to_send){
@@ -91,6 +89,7 @@ int main(/*int argc, char *argv[]*/)
 			printf
 			free ??
 		}*/
+    writePHP( requete->clientId, &PHP_data);
 
 		endWriteDirectClient(requete->clientId);
 
@@ -125,7 +124,8 @@ int writeHeaders(unsigned int clientId, Header_List reponseHL){
 		ptr = ptr2;
 	}
 	printf(NC "\n++++\n");
-	//Eventually, last CRLF
+  //Termine la partie header avec un deuxième CRLF
+  //writeDirectClient(requete->clientId, "\r\n", 2);
 	return 0;
 }
 
@@ -151,5 +151,25 @@ int send_file(unsigned int clientId, Fichier file){
 	writeDirectClient(clientId,ptr,len);
 
 	close(fd);
+	return 0;
+}
+
+int writePHP(unsigned int clientId, Header_List *PHP_data){
+
+  if(PHP_data->next==NULL) return -1;
+
+	Header_List *ptr;
+	ptr = PHP_data->next;
+	Header_List *ptr2;
+	while(ptr){
+		writeDirectClient(clientId, ptr->header.data, ptr->header.count);
+		printf(SV_Fmt, SV_Arg(ptr->header));
+		ptr2 = ptr->next;
+		free(ptr->header.data);
+		free(ptr);
+		ptr = ptr2;
+	}
+	printf(NC "\n++++\n");
+  PHP_data->next=NULL;
 	return 0;
 }

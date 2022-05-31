@@ -165,8 +165,11 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	header_param.version=FCGI_VERSION_1;
 	header_param.type=FCGI_PARAMS;
 	header_param.requestId=htons(10);
+	header_param.contentLength=0;
+	header_param.paddingLength=0;
 	//convert headers->host from String_Value to char*
 	char tmp[FASTCGIMAXNVPAIR];
+	char tmp2[FASTCGIMAXNVPAIR];
 	char pwd[FASTCGIMAXNVPAIR];
 	getcwd(pwd, FASTCGIMAXNVPAIR);
 
@@ -178,31 +181,61 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	//addNameValuePair(&header_param,"SERVER_ADDR", "localhost");
 	addNameValuePair(&header_param,"SERVER_PORT", "8080");
 	//addNameValuePair(&header_param,"REMOTE_ADDR", "localhost");
-	strcpy(tmp,pwd);
-	if(site_param->DocumentRoot[0] != '\0')strcat(tmp,"/");
-	strcat(tmp,site_param->DocumentRoot);
-	addNameValuePair(&header_param,"DOCUMENT_ROOT", site_param->DocumentRoot);
 	addNameValuePair(&header_param,"REQUEST_SCHEME", "http");
-	addNameValuePair(&header_param,"CONTEXT_DOCUMENT_ROOT", site_param->DocumentRoot);
-	strcpy(tmp,pwd);
-	if(site_param->DocumentRoot[0] != '\0')strcat(tmp,"/");
-	addNameValuePair(&header_param,"CONTEXT_PREFIX", tmp);
 	addNameValuePair(&header_param,"SERVER_ADMIN", "root@localhost");
-	char scriptPrefix[] = "proxy:fcgi://127.0.0.1:9000/";   // TODO : change this
-	//concatenate the scriptFileName with the DocumentRoot and the file->path
-	strcpy(tmp,scriptPrefix);
-	strcat(tmp,pwd);
-	if(site_param->DocumentRoot[0] != '\0')strcat(tmp,"/");
-	strcat(tmp,file->path);
-	addNameValuePair(&header_param,"SCRIPT_FILENAME", tmp);  //is it the right path ?
+
+	if(site_param->DocumentRoot[0] == '/'){
+		strcpy(tmp,site_param->DocumentRoot);
+		addNameValuePair(&header_param,"DOCUMENT_ROOT", site_param->DocumentRoot);
+	}
+	else{
+		addNameValuePair(&header_param,"CONTEXT_DOCUMENT_ROOT", site_param->DocumentRoot);
+		addNameValuePair(&header_param,"CONTEXT_PREFIX", pwd);
+
+		strcpy(tmp,pwd);
+		strcat(tmp,"/");
+		strcat(tmp,file->path);
+	}
+
+
+	char scriptPrefix[] = "proxy:fcgi://127.0.0.1:9000/";   // Valeur par défaut
+	strcpy(tmp2,scriptPrefix);
+	strcat(tmp2,tmp);
+	addNameValuePair(&header_param,"SCRIPT_FILENAME", tmp2);  //is it the right path ?
+
 	//addNameValuePair(&header_param,"REMOTE_PORT", "56842");  //TODO an other one Dj Khaled
 	addNameValuePair(&header_param,"GATEWAY_INTERFACE", "CGI/1.1");
 	addNameValuePair(&header_param,"SERVER_PROTOCOL", "HTTP/1.1");
-	addNameValuePair(&header_param,"REQUEST_METHOD", "GET");
-	//addNameValuePair(&header_param,"QUERY_STRING", "");
-	strncpy(tmp,headers->absolutePath.data,headers->absolutePath.count);
-	tmp[headers->absolutePath.count]='\0';
-	addNameValuePair(&header_param,"REQUEST_URI", tmp);
+
+
+	switch(headers->method){
+		case GET:
+			strcpy(tmp2,"GET");
+		break;
+		case POST:
+
+				strncpy(tmp2,headers->referer.data,headers->referer.count); tmp2[headers->referer.count]='\0';
+			addNameValuePair(&header_param,"HTTP_REFERER", tmp2);
+				strncpy(tmp2,headers->contentType.data,headers->contentType.count); tmp2[headers->contentType.count]='\0';
+			addNameValuePair(&header_param,"CONTENT_TYPE", tmp2);
+				strncpy(tmp2,headers->contentLength.data,headers->contentLength.count); tmp2[headers->contentType.count]='\0';
+			addNameValuePair(&header_param,"CONTENT_LENGTH", tmp2);
+
+			strcpy(tmp2,"POST");
+		break;
+		case HEAD:
+			strcpy(tmp2,"HEAD");
+		break;
+	}
+	addNameValuePair(&header_param,"REQUEST_METHOD", tmp2);
+
+	if(headers->query.count){
+		strncpy(tmp2,headers->query.data,headers->query.count);
+		tmp2[headers->query.count]='\0';
+	}else
+		tmp2[0]=0;
+	addNameValuePair(&header_param,"QUERY_STRING", tmp2);
+	addNameValuePair(&header_param,"REQUEST_URI", file->path+file->middle);
 	addNameValuePair(&header_param,"SCRIPT_NAME", file->path+file->last_slash); // TODO : check this
 
 	int fd;
@@ -211,6 +244,12 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	sendBeginRequest(fd,10,FCGI_RESPONDER,FCGI_KEEP_CONN);
 	writeSocket(fd, &header_param, FCGI_HEADER_SIZE + header_param.contentLength + header_param.paddingLength);
 	sendParam(fd,10,NULL,0);
+
+	if(headers->method == POST){
+		printf("MSG_BODY:"SV_Fmt"\n",SV_Arg(headers->msg_body));
+		sendStdin(fd,10,headers->msg_body.data,headers->msg_body.count);
+	}
+
 	sendStdin(fd,10,NULL,0);
 
 
@@ -226,8 +265,6 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 
 	while(h.type != FCGI_END_REQUEST){
 
-			ptr = malloc (sizeof(Header_List));
-			tab = malloc (sizeof(char)*FASTCGILENGTH);
 
 			//Lit headers
 			read(fd,&h,FCGI_HEADER_SIZE);
@@ -239,33 +276,79 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 			printf("requestID:%d\n",h.requestId);
 			printf("contentLength:%d\n",h.contentLength);
 			printf("paddingLength:%d\n",h.paddingLength);
+
 			int n=h.contentLength+h.paddingLength;
 			int m=0;
 			int k;
-			while(m<n){
-				k= read(fd,tab+m,n-m);
-				if(k==-1) {printf("break"); break;}
-				m+=k;
-				printf("%d ",m);
+
+			if(h.type == FCGI_STDOUT){
+
+				ptr = malloc (sizeof(Header_List));
+				tab = malloc (sizeof(char)*FASTCGILENGTH);
+
+				while(m<n){
+					k= read(fd,tab+m,n-m);
+					if(k==-1) {printf("break"); break;}
+					m+=k;
+					printf("%d ",m);
+				}
+				puts("");
+				printf("contentData:%.*s\n",10,tab);
+
+				ptr->header.data = tab;
+				ptr->header.count = h.contentLength;
+
+				bak->next=ptr;
+				bak=ptr;
+			}else{
+				while(m<n){
+					k= read(fd,h.contentData+m,n-m);
+					if(k==-1) {printf("break"); break;}
+					m+=k;
+				}
+				h.contentData[n]='\0';
+				printf("DEBUG:%s",h.contentData);
 			}
-			puts("");
-			printf("contentData:%.*s\n",10,tab);
 
-			ptr->header.data = tab;
-			ptr->header.count = h.contentLength;
-
-			bak->next=ptr;
-			bak=ptr;
 
 	}
 	ptr->next=NULL;
 	close(fd);
 
+	int count = 0;
+	int count_flag = 0;
 	ptr=PHP_data->next;
 	while(ptr){
-		printf("]%.20s\n",ptr->header.data);
+		printf("]"SV_Fmt"\n",SV_Arg(ptr->header));
+		//Compte le Content-length
+		if (count_flag == 0){
+			for(size_t i=0; i<ptr->header.count; i++){
+			if(count_flag == 0) {
+				if(!strncmp(ptr->header.data+i,"\r\n\r\n",4)){
+					i+=3; count=0; count_flag=1;
+				}
+			}else
+				count++;
+		}}
+		else
+			count+=ptr->header.count;
+
 		ptr=ptr->next;
 	}
+	printf("Content-length:%d",count);
+
+
+	//Construction de la réponse
+	reponse->len = snprintf(reponse->content, HEADER_LEN_MAX, SERV_VERSION(headers->httpVersion) );
+	reponse->len += snprintf(reponse->content+reponse->len, HEADER_LEN_MAX,
+		" 200 OK\r\nContent-length:%d\r\n",count);
+	//keep-alive
+	if(!headers->connection.keepAlive)
+		reponse->len += snprintf(reponse->content+reponse->len,
+		HEADER_LEN_MAX-reponse->len,
+		"Connection: close\r\n");
+
+
 
 return OK;
 }

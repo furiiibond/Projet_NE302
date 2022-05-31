@@ -46,32 +46,35 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 			status_code = traiter_URI(file,headers,host_ptr);
 		}
 
-		printf("Extention: %s\n",file->path+file->length-3);
-		if (status_code == OK)
-			if(!strcmp(file->path+file->length-4, ".php")){
-				printf(BLU"Request PHP script execution"NC"\n");
-				executePHP(host_ptr, headers, file, reponse, PHP_data);
-			}
+
+
 
 		/* ----------------------------------------- */
-		if (status_code == OK)
-		switch(method){
-			case GET:
-			case POST:
-				file->to_send = 1;
-				/* fall through */
-			case HEAD:
-				status_code = traiter_GET(headers, reponse, reponseHL, file);
-			break;
-			case PUT:
-			case DELETE:
-			case CONNECT:
-			case OPTIONS:
-			case TRACE:
-				status_code = ERR_405; //Erreur 405 méthode non supporté
-			break;
-			default:
-				status_code = ERR_501; //Erreur 501 méthode non reconnue
+		if (status_code == OK){
+			printf("Extention: %s\n",file->path+file->length-3);
+			if(!strcmp(file->path+file->length-4, ".php")){
+				printf(BLU"Request PHP script execution"NC"\n");
+				status_code = executePHP(host_ptr, headers, file, reponse, PHP_data);
+			}
+			else
+			switch(method){
+				case GET:
+				case POST:
+					file->to_send = 1;
+					/* fall through */
+				case HEAD:
+					status_code = traiter_GET(headers, reponse, reponseHL, file);
+				break;
+				case PUT:
+				case DELETE:
+				case CONNECT:
+				case OPTIONS:
+				case TRACE:
+					status_code = ERR_405; //Erreur 405 méthode non supporté
+				break;
+				default:
+					status_code = ERR_501; //Erreur 501 méthode non reconnue
+			}
 		}
 
 		purgeTree(root);

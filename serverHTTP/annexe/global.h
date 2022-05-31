@@ -52,6 +52,13 @@ typedef struct {
   struct connect connection;
   String_View absolutePath;
   String_View accept[10];
+  String_View query;
+	/* =================== */
+  String_View msg_body;
+  String_View referer;
+  String_View contentType;
+  String_View contentLength;
+
 } HeaderStruct;
 
 

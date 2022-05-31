@@ -1,36 +1,36 @@
-ALPHA = %x41-5A / %x61-7A  
-DIGIT = %x30-39  
-HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"  
-DQUOTE = %x22  
-SP = %x20  
-HTAB = %x09  
-OWS = * ( SP / HTAB ) 
-VCHAR = %x21-7E  
-CHAR = %x01-7F  
-CR = %x0D  
-LF = %x0A 
-CRLF = CR LF 
+ALPHA = %x41-5A / %x61-7A
+DIGIT = %x30-39
+HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+DQUOTE = %x22
+SP = %x20
+HTAB = %x09
+OWS = * ( SP / HTAB )
+VCHAR = %x21-7E
+CHAR = %x01-7F
+CR = %x0D
+LF = %x0A
+CRLF = CR LF
 
-tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA 
-nicechar = "!" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / "/" / DQUOTE / DIGIT / ALPHA 
-pathchar =  "!" / "$" / "%" / "&" / "'" / "+" / "-" / "." / "^" / "_" / "`" / "~" / DIGIT / ALPHA 
+tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
+nicechar = "!" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / "/" / ":" / DIGIT / ALPHA
+pathchar =  "!" / "$" / "%" / "&" / "'" / "+" / "-" / "." / "^" / "_" / "`" / "~" / DIGIT / ALPHA
 
-Config = * ReturnOptCom 1* ( Entry  * ( Comment / CRLF ) ) 
+Config = * ReturnOptCom 1* ( Entry  * ( Comment / CRLF ) )
 
-ReturnOptCom = [ Comment ] CRLF 
+ReturnOptCom = [ Comment ] CRLF
 
-Comment = "#" * ( VCHAR / SP / HTAB ) 
+Comment = "#" * ( VCHAR / SP / HTAB )
 
-Entry =  Hostname OWS "{" OWS [CRLF] Params "}" 
+Entry =  Hostname OWS "{" OWS [CRLF] Params "}"
 
-Hostname = 1* ( ALPHA / ( "." ALPHA ) ) 
+Hostname = 1* ( ALPHA / ( "." ALPHA ) )
 
-Params = DocRoot * nondef 
+Params = DocRoot * nondef
 
-DocRoot = OWS "Root-dir" OWS "=" OWS DQUOTE Path DQUOTE OWS ReturnOptCom 
-DIRname =  1* pathchar  
+DocRoot = OWS "Root-dir" OWS "=" OWS DQUOTE Path DQUOTE OWS ReturnOptCom
+DIRname =  1* pathchar
 Path = [ "/" ] * ( DIRname "/" ) DIRname
 
-nondef = OWS param-name OWS "=" OWS value OWS ReturnOptCom 
-param-name = 1* nicechar 
-value = 1* nicechar 
+nondef = OWS param-name OWS "=" OWS DQUOTE value DQUOTE OWS ReturnOptCom
+param-name = 1* nicechar
+value = 1* nicechar
