@@ -49,7 +49,7 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 	//HTTP Version
 	reponse->len = snprintf(reponse->content, HEADER_LEN_MAX, SERV_VERSION(headers->httpVersion) );
 	//Status Code + Content-Type + Content-Length
-	reponse->len += snprintf(reponse->content+reponse->len, HEADER_LEN_MAX,
+	reponse->len += snprintf(reponse->content+reponse->len, HEADER_LEN_MAX-reponse->len,
 		" 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
 			file->type, file->length);
 	//Connection
@@ -57,6 +57,9 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 		reponse->len += snprintf(reponse->content+reponse->len,
 		HEADER_LEN_MAX-reponse->len,
 		"Connection: close\r\n");
+
+	reponse->len += snprintf(reponse->content+reponse->len,
+		HEADER_LEN_MAX-reponse->len, "\r\n");
 
 	/** DYNAMIC ALLOCATION --------------------- */
 	//Fonction pour remplir la header list

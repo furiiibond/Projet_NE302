@@ -84,11 +84,8 @@ int main(/*int argc, char *argv[]*/)
 				send_file(requete->clientId, file);
 				printf("["BLU"Fichier"NC":"MAG"%s"NC"] %s\n\n",file.type,file.path);
 		}
-		/**if(champ_php->to_send){
-			send php
-			printf
-			free ??
-		}*/
+
+
     writePHP( requete->clientId, &PHP_data);
 
 		endWriteDirectClient(requete->clientId);
