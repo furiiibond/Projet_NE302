@@ -16,15 +16,11 @@ _Token *searchTree(void *start, char *name) {
             tmp = getRootTree();
         _Token *r = NULL;
 
-        /*
-        int i=0;
-        while(name[i] != '\0'){
-          if (name[i]=='_') //Fixing the fix
-            name[i]='-';
-          i++;
-        }*/
+        if (strcmp(tmp->tag, name) == 0) {
+              r = generateToken(tmp);
+        }
 
-        _searchTree(tmp, name, &r);
+        _searchTree(tmp->child, name, &r);
         return r;
 }
 
@@ -72,7 +68,7 @@ int parseur(char *req, int len) {
 
 
     int r = construire(first_tag, getRootTree());
-	
+
 	((node*) getRootTree())->len_value = mem-req;
 
 	FIX_FINAL_NE_PAS_TOUCHER();
@@ -90,4 +86,3 @@ int parseur(char *req, int len) {
 	#endif
     return r;
 }
-

@@ -32,7 +32,7 @@
 
 // Pour option_parser
 #define HOST_LEN_MAX 64
-
+#define PHPHANDLER "phpHandler"
 
 // Module image Magic
 #define DEFAULT_TYPE "text/plain"

@@ -53,7 +53,7 @@ typedef struct {
   String_View absolutePath;
   String_View accept[10];
   String_View query;
-	/* =================== */
+	/* =====POST========== */
   String_View msg_body;
   String_View referer;
   String_View contentType;
@@ -68,6 +68,7 @@ struct Options {
 	char ServerName[HOST_LEN_MAX];
 	char DocumentRoot[PATH_LEN_MAX];
 
+	char PHPHandler[100];
 
 	struct Options* next;
 };
