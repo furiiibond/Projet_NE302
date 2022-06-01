@@ -344,7 +344,11 @@ int executePHP(struct Options* site_param, HeaderStruct* headers, Fichier* file,
 	reponse->len += snprintf(reponse->content+reponse->len, HEADER_LEN_MAX,
 		" 200 OK\r\nContent-length:%d\r\n",count);
 	//keep-alive
-	if(!headers->connection.keepAlive)
+	if(headers->connection.keepAlive)
+		reponse->len += snprintf(reponse->content+reponse->len,
+			HEADER_LEN_MAX-reponse->len,
+			"Connection: keep-alive\r\nKeep-Alive: timeout=5, max=2\r\n");
+	else
 		reponse->len += snprintf(reponse->content+reponse->len,
 		HEADER_LEN_MAX-reponse->len,
 		"Connection: close\r\n");

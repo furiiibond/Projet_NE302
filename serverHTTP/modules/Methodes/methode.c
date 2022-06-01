@@ -53,7 +53,11 @@ int traiter_GET( HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseH
 		" 200 OK\r\nContent-type:%s\r\nContent-length:%ld\r\n",
 			file->type, file->length);
 	//Connection
-	if(!headers->connection.keepAlive)
+	if(headers->connection.keepAlive)
+		reponse->len += snprintf(reponse->content+reponse->len,
+			HEADER_LEN_MAX-reponse->len,
+			"Connection: keep-alive\r\nKeep-Alive: timeout=5, max=2\r\n");
+	else
 		reponse->len += snprintf(reponse->content+reponse->len,
 		HEADER_LEN_MAX-reponse->len,
 		"Connection: close\r\n");
