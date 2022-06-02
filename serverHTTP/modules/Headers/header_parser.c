@@ -8,26 +8,14 @@ void meth_trouve(HeaderStruct* headers,char* s, int l);
 	Cette fonction remplis la structure header avec les valeurs
 	lues dans l'arbre de la requète parsée
 */
-int traiter_Header(_Token *root, HeaderStruct* headers){
+int traiter_Header( HeaderStruct* headers){
+	_Token *root = getRootTree();
 	_Token *req,*t,*ptr;
 	int l;
 	char *s;
 
 	// Initialisation des headers optionels:
 	memset(headers, 0, sizeof(HeaderStruct));
-	/*
-	headers->host.count = 0;
-	headers->connection.keepAlive=0;
-	headers->connection.close=0;
-	headers->query.data=NULL;
-	headers->msg_body.data=NULL;
-	headers->msg_body.count=0;
-	headers->referer.data=NULL;
-	headers->referer.count=0;
-	headers->contentType.data=NULL;
-	headers->contentType.count=0;
-	headers->contentLength.data=NULL;
-	headers->contentLength.count=0;*/
 
 	// Request Target [Obligatoire]
 	req = searchTree(root, "request-line");
@@ -92,20 +80,6 @@ int traiter_Header(_Token *root, HeaderStruct* headers){
 	}
 	purgeElement(&req);
 
-	//Accept [Optionnel]
-	req = searchTree(root, "Accept-header");
-	if (req){
-		t = searchTree(req->node, " media-range");
-		ptr=t;
-		int i=0;
-		while (ptr && i<10){
-			headers->accept[i].data = getElementValue(ptr->node, (int *) &(headers->accept[i].count));
-			ptr =ptr->next;
-			i++;
-		}
-		purgeElement(&t);
-	}
-	purgeElement(&req);
 
 	// Message Body [Optionel]
 	req = searchTree(root, "message-body");

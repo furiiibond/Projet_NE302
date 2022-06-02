@@ -26,7 +26,6 @@
 
 
 int send_file(unsigned int clientId, Fichier file);
-int writeHeaders(unsigned int clientId, Header_List reponseHL);// DYNAMIC ALLOCATION
 int writePHP(unsigned int clientId, Header_List *PHP_data);
 
 /**
@@ -44,38 +43,23 @@ int main(/*int argc, char *argv[]*/)
 	load_gramm_rule(HTTP_RULES);// charge la grammaire HTTP
 
 
-	/** DYNAMIC ALLOCATION
-	Declaration d'une Header List
-	 - Header initial */
-	char init[100]="HTTP/1.1 ........................";
-	Header_List reponseHL={
-	    { 9, init },
-		NULL
-	};
-	reponseHL.header.data[7]='5';
-	/** ----------------------- */
-
 	printf(CYN"#------------	Server Ready	------------#\n"NC);
 
 	 while( 1 ) {
 		// on attend la reception d'une requete HTTP, requete pointera vers une ressource allouée par librequest.
-		if ((requete=getRequest(8080)) == NULL ) return -1;
+		if ((requete=getRequest(SERVERPORT)) == NULL ) return -1;
 
 		// Affichage de debug
 		printf(RED"\n#########################################"GRN"\nDemande recue depuis le client %d\n"NC,requete->clientId);
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
 		printf(YEL"Contenu de la demande"NC"\n%.*s\n",requete->len,requete->buf);
 
-
-		reponseHL.next = NULL;// DYNAMIC ALLOCATION
-
-		RequestHandler(requete, &headers, &reponse, &reponseHL, &file, &PHP_data);
+    /** Main Function */
+		RequestHandler(requete, &headers, &reponse, &file, &PHP_data);
 
 		//HEADER response
 		writeDirectClient(requete->clientId, reponse.content, reponse.len);
 		printf(YEL"Contenu de la reponse"NC"\n%.*s\n",reponse.len,reponse.content);
-
-	  //writeHeaders(requete->clientId, reponseHL);// DYNAMIC ALLOCATION
 
 
 		//Action à faire en fonction de la methode
@@ -85,11 +69,10 @@ int main(/*int argc, char *argv[]*/)
 				printf("["BLU"Fichier"NC":"MAG"%s"NC"] %s\n\n",file.type,file.path);
 		}
 
-
     writePHP( requete->clientId, &PHP_data);
 
-		endWriteDirectClient(requete->clientId);
 
+		endWriteDirectClient(requete->clientId);
 
 		if (!headers.connection.keepAlive){
 			printf(YEL"Shutding down connection\n"NC);
@@ -97,8 +80,7 @@ int main(/*int argc, char *argv[]*/)
 		}
 
 		printf("Free Request ___\n");
-		// on ne se sert plus de requete a partir de maintenant, on peut donc liberer...
-		freeRequest(requete);
+    freeRequest(requete);
 	}
 	printf("exit\n");
 	close_gramm_rule();
@@ -106,28 +88,9 @@ int main(/*int argc, char *argv[]*/)
 	return (1);
 }
 
-/** DYNAMIC ALLOCATION */
-int writeHeaders(unsigned int clientId, Header_List reponseHL){
-	writeDirectClient(clientId, reponseHL.header.data, reponseHL.header.count);
-	printf(MAG "DEBUG: %.*s", (int) reponseHL.header.count, reponseHL.header.data);
-	Header_List *ptr;
-	ptr = reponseHL.next;
-	Header_List *ptr2;
-	while(ptr){
-		writeDirectClient(clientId, ptr->header.data, ptr->header.count);
-		printf("%.*s", (int) ptr->header.count, ptr->header.data);
-		ptr2 = ptr->next;
-		free(ptr->header.data);
-		free(ptr);
-		ptr = ptr2;
-	}
-	printf(NC "\n++++\n");
-  //Termine la partie header avec un deuxième CRLF
-  writeDirectClient(clientId, "\r\n", 2);
-	return 0;
-}
 
 //TODO: Fix for large files ( >1.4G )
+/* mmap un fichier et l'envoie directement au client */
 int send_file(unsigned int clientId, Fichier file){
 
 	// if (access( file.path, F_OK )) return -1; // On a déjà checké normalement
@@ -152,22 +115,24 @@ int send_file(unsigned int clientId, Fichier file){
 	return 0;
 }
 
+/* Lit la liste chainée, envoie le contenu au client, puis free chacun des noeuds */
 int writePHP(unsigned int clientId, Header_List *PHP_data){
 
   if(PHP_data->next==NULL) return -1;
 
 	Header_List *ptr;
-	ptr = PHP_data->next;
+  /* On commence au deuxième noeud car le premier est statique et
+      sert juste de point d'ancrage */
+  ptr = PHP_data->next;
 	Header_List *ptr2;
 	while(ptr){
 		writeDirectClient(clientId, ptr->header.data, ptr->header.count);
-		//printf(SV_Fmt, SV_Arg(ptr->header));
 		ptr2 = ptr->next;
 		free(ptr->header.data);
 		free(ptr);
 		ptr = ptr2;
 	}
-	printf(NC "\n++++\n");
+	printf(NC "++++\n");
   PHP_data->next=NULL;
 	return 0;
 }

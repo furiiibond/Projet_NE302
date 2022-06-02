@@ -58,6 +58,8 @@ int FillHostsParametres(void){
 	}
 
 
+// ====== BEGIN Constructing Entries =>
+
 	_Token *r,*r2,*tok,*tok2,*Entry_list;
 	Entry_list = searchTree( NULL, "Entry"); // Le 1er arg est NULL donc utilise parse tree root
 	struct Options* hostparlist = NULL;
@@ -69,14 +71,17 @@ int FillHostsParametres(void){
 	}
 
 	while(tok != NULL){
-		if (hostparlist){ /* Cas des autres boucles, insertion en queue */
+    /* Manip liste chainée */
+    if (hostparlist){ /* Cas des autres boucles, insertion en queue */
 			hostparlist->next = malloc(sizeof(struct Options));
 			hostparlist = hostparlist->next;
 		}else{ /* Cas de la première boucle, met à jour le pointeur global */
 			hostparlist = malloc(sizeof(struct Options));
 			HostsParametres = hostparlist;
 		}
-		char *s; int l;
+
+    char *s; int l;
+
     // Hostname [Obligatoire]
 		r = searchTree( tok->node, "Hostname");
 		s = getElementValue(r->node, &l);
@@ -97,15 +102,17 @@ int FillHostsParametres(void){
 		purgeElement(&r2);
 
 
+/*    Prise en charge des paramètres non définis  */
 		r = searchTree( tok->node, "nondef");
     tok2 = r;
     while(tok2){
 
-      // PHP Handler [Optionnel]
       r2 = searchTree( tok2->node, "param-name");
       s = getElementValue(r2->node, &l);
       printf("tok2:%.*s\n",l,s);
       purgeElement(&r2);
+
+      // PHP Handler [Optionnel]
       if(!strncmp(s,PHPHANDLER,strlen(PHPHANDLER))){
         r2 = searchTree( tok2->node, "value");
         s = getElementValue(r2->node, &l);

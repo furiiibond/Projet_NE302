@@ -38,6 +38,8 @@
 #define DEFAULT_TYPE "text/plain"
 
 
+#define SERVERPORT 8080
+
 //#####~Docs~#######
 //
 // apache2: 		https://www.liquidweb.com/kb/configure-apache-virtual-hosts-ubuntu-18-04/

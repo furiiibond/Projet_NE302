@@ -23,35 +23,35 @@
 struct Options* get_host_ptr(HeaderStruct* headers);
 int traiter_URI(Fichier* file, HeaderStruct* headers, struct Options* host_ptr);
 
-int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseHL, Fichier* file, Header_List* PHP_data){
-	int res,status_code;
+int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, Fichier* file, Header_List* PHP_data){
+	int status_code;
 	int method;
 	file->to_send=0;
-	if ((res=parseur(requete->buf,requete->len))) {
-		_Token *root;
-		struct Options* host_ptr;
+	if ( parseur(requete->buf,requete->len) == FALSE ) {
+		printf(RED "Requete non parsée\n" NC);
+		/* ERROR BAD REQUEST */
+		status_code = ERR_400;
+	} else {
+		//		Execution normale
 		printf(GRN "Requete parsée\n" NC);
+		struct Options* host_ptr;
 
-		root=getRootTree();
-
-		traiter_Header(root, headers);
-		method = headers->method;
-
+		traiter_Header(headers);
 		status_code = verifSemantique(headers);
+
+		method = headers->method;
 
 		/* ----------------------------------------- */
 		if (status_code == OK){
+
 			host_ptr = get_host_ptr(headers);
 
 			status_code = traiter_URI(file,headers,host_ptr);
 		}
 
 
-
-
 		/* ----------------------------------------- */
 		if (status_code == OK){
-			printf("Extention: %s\n",file->path+file->length-4);
 			if(!strcmp(file->path+file->length-4, ".php")){
 				printf(BLU"Request PHP script execution"NC"\n");
 				status_code = executePHP(host_ptr, headers, file, reponse, PHP_data);
@@ -63,7 +63,7 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 					file->to_send = 1;
 					/* fall through */
 				case HEAD:
-					status_code = traiter_GET(headers, reponse, reponseHL, file);
+					status_code = traiter_GET(headers, reponse, file);
 				break;
 				case PUT:
 				case DELETE:
@@ -76,13 +76,6 @@ int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, H
 					status_code = ERR_501; //Erreur 501 méthode non reconnue
 			}
 		}
-
-		purgeTree(root);
-
-	} else {
-		printf(RED "Requete non parsée\n" NC);
-		/* ERROR BAD REQUEST */
-		status_code = ERR_400;
 	}
 
 	if(status_code < 0){
@@ -129,9 +122,6 @@ int traiter_URI(Fichier* file, HeaderStruct* headers, struct Options* host_ptr){
 	printf("full path: %s\n",file->path);
 	file->last_slash = strrchr(file->path, '/') - file->path;
 
-
-	//if(is_illegal(file))
-	//	return ERR_451;
 
 	return OK;
 }

@@ -6,3 +6,4 @@ lsof -> list openned files
 	( [lsof +D www] pour voir les fichiers web non fermé)
 
  
+valgrind -v --leak-check=full --track-origins=yes --show-leak-kinds=all ./server

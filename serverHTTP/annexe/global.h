@@ -51,7 +51,6 @@ typedef struct {
   String_View host;
   struct connect connection;
   String_View absolutePath;
-  String_View accept[10];
   String_View query;
 	/* =====POST========== */
   String_View msg_body;

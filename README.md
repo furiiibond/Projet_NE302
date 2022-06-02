@@ -15,21 +15,15 @@ et copie l'executable dans le dossier courant
 Développeurs:
 - parametres.h
 	COLOR = active ou non la couleur dans la sortie terminal
-	HTTP_RULES = couple (nom du fichier abnf pour les requêtes HTTP, 
+	HTTP_RULES = couple (nom du fichier abnf pour les requêtes HTTP,
 						 le premier tag )
 	PATH_LEN_MAX = longueur maximale pour le chemin d'un fichier
 	HEADER_LEN_MAX = longueur maximum pour les headers de la réponse HTTP
 	SERV_CONFIG = nom du fichier de configuration serveur
-	CONF_RULES = couple (nom du fichier abnf pour la config serveur, 
+	CONF_RULES = couple (nom du fichier abnf pour la config serveur,
 						 le premier tag )
 
 Utilisateurs:
-Fichiers abnf
-*Si vous ne savez pas ce que vous faites il est recommandé de ne pas toucher à ceux fournis*
-- fullrfc.abnf
-	La syntaxe abnf pour parser les requêtes HTTP.
-- config.abnf
-	La syntaxe abnf pour parser le fichier de configuration.
 Fichier de configuration
 - server.conf
 	La syntaxe et la suivante:
@@ -44,6 +38,12 @@ Fichier de configuration
 		ne doit pas se terminer par un /)
 	Si le hostname n'est pas reconnu, le serveur défaut sur
 	la première entrée.
+Fichiers abnf
+*Si vous ne savez pas ce que vous faites il est recommandé de ne pas toucher à ceux fournis*
+	- fullrfc.abnf
+		La syntaxe abnf pour parser les requêtes HTTP.
+	- config.abnf
+		La syntaxe abnf pour parser le fichier de configuration.
 
 
 ======================================================================
@@ -65,7 +65,7 @@ Fichier de configuration
 - Percent Encoding:
 	Traduction d'une url pourcent encodée vers un chemin de type UNIX
 - Multi Site:
-	Si HTTP/1.1, support du multi site en fonction du champ 
+	Si HTTP/1.1, support du multi site en fonction du champ
 	Host et du fichier config
 - Gestion des Erreurs:
 	400 Bad Request

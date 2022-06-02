@@ -16,5 +16,4 @@
 	l'action correspondante à la méthode.
 */
 
-int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, Header_List* reponseHL, Fichier* file, Header_List* PHP_data);
-
+int RequestHandler(message *requete, HeaderStruct* headers, HTML_Rep* reponse, Fichier* file, Header_List* PHP_data);
