@@ -11,6 +11,24 @@ et copie l'executable dans le dossier courant
 
 ======================================================================
 
+**** Instructions pour les tests fournis:
+
+** Configuration du serveur PHP:
+make phpPort:
+		Configure php-fpm 7.4 pour qu'il écoute sur le port 9000
+		Puis restart le service
+** Configuration des noms
+make hosts:
+		Ajoute sitecool.com et numerodos.tv à /etc/hosts
+		(Les deux entrées du fichier serv.conf fournis)
+** Configuration du chemin vers librairy partagée
+make export:
+		Puis copier coller la ligne par défaut
+Sinon ajouter un chemin (relatif ou absolu) vers les dossier contenant
+librequest et libnotreparser.
+
+======================================================================
+
 **** Fichiers configurables:
 Développeurs:
 - parametres.h
@@ -22,6 +40,7 @@ Développeurs:
 	SERV_CONFIG = nom du fichier de configuration serveur
 	CONF_RULES = couple (nom du fichier abnf pour la config serveur,
 						 le premier tag )
+	SERVERPORT = port du server (8080)
 
 Utilisateurs:
 Fichier de configuration

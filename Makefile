@@ -48,4 +48,4 @@ clean:
 
 # Créée une distribution tar
 tar:
-	tar -cvzf PROJET_NE302-$(GROUPE)-$(NAMES).tar.gz * --exclude="$(IGNORE)"
+	tar -cvzf PROJET_NE302-$(GROUPE)-$(NAMES).tar.gz --exclude="$(IGNORE)" *
