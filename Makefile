@@ -7,6 +7,8 @@ LIBPARS = libnotreparser
 LIBREQ = librequest-0.5
 SERVER = serverHTTP
 IGNORE = EXEC
+PHPVERSION = 7.4
+PHPCONF = /etc/php/$(PHPVERSION)/fpm/pool.d/www.conf
 
 EXEC = server
 
@@ -21,6 +23,12 @@ export:
 hosts:
 	sudo sh -c 'echo "127.0.0.1	sitecool.com" >> /etc/hosts'
 	sudo sh -c 'echo "127.0.0.1	numerodos.tv" >> /etc/hosts'
+
+# Configure le serveur PHP sur le port 9000
+phpPort:
+	sudo sh -c "sed -i 's/^\ *listen\ *=/;listen\ =/' $(PHPCONF)"
+	sudo sh -c "sed -i '36i listen=9000' $(PHPCONF)"
+	sudo systemctl restart php$(PHPVERSION)-fpm
 
 # Compile le serveur
 main:
